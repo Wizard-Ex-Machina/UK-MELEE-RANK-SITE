@@ -1,6 +1,7 @@
 import "~/styles/globals.css";
 
-import { Inter, Playfair_Display, Noto_Sans_Display } from "next/font/google";
+import { Inter } from "next/font/google";
+import Title from "./_components/title";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,17 +14,6 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const noto_Sans_Display = Noto_Sans_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-noto_Sans_Display",
-});
-
-const playfair_display = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-playfair",
-});
 export default function RootLayout({
   children,
 }: {
@@ -31,7 +21,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>{children}</body>
+      <body className={`font-sans ${inter.variable} bg-zinc-900`}>
+        <Title />
+        {children}
+      </body>
     </html>
   );
 }

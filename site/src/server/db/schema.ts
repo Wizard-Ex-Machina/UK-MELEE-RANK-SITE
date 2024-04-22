@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  integer,
-  text,
-  date,
-  foreignKey,
-  numeric,
-} from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { pgTable, integer, text, date, numeric } from "drizzle-orm/pg-core";
 
 export const players = pgTable("players", {
   id: integer("id").primaryKey().notNull(),
