@@ -8,7 +8,6 @@ type RatingRowProps = {
   rd: number;
 };
 export function RatingRow(props: RatingRowProps) {
-  log(props.rank % 2);
   let changeColor = "text-white",
     changeSign = "~";
   if (props.change > 0) {
@@ -18,7 +17,7 @@ export function RatingRow(props: RatingRowProps) {
     changeColor = "text-red-500";
     changeSign = "↓";
   }
-  const colors = ["bg-zinc-700", "bg-zinc-500"];
+  const colors = ["bg-zinc-700", "bg-zinc-600"];
   return (
     <div className={"h8 flex w-full rounded-md p-1 " + colors[props.rank % 2]}>
       <div className="w-16 items-center">

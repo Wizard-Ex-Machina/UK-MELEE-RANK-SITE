@@ -1,6 +1,6 @@
 export function RatingTitle() {
   return (
-    <div className="h8 flex w-full rounded-md bg-gradient-to-b from-amber-900 to-orange-900 p-1">
+    <div className="h8 flex w-full rounded-md bg-amber-700  p-1">
       <div className="w-16 items-center">
         <p className="text-center">Rank</p>
       </div>

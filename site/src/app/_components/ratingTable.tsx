@@ -2,10 +2,18 @@ import { RatingTitle } from "./RatingTitle";
 import { RatingRow } from "./RatingRow";
 import { db } from "../../server/db";
 import { sql } from "drizzle-orm";
-import { log } from "console";
+
+type Player = {
+  id: number;
+  name: string;
+  rating: number;
+  rd: number;
+  rating_change: number;
+  total_match_count: number;
+};
 
 export default async function RatingTable() {
-  const players: any[] = await db.execute(sql`
+  const players: Player[] = await db.execute(sql`
         SELECT
           p.id,
           p.name,
@@ -81,8 +89,7 @@ export default async function RatingTable() {
   return (
     <div className="w-full px-96">
       <RatingTitle />
-      {players.map((player: any, index: number) => {
-        log(player);
+      {players.map((player: Player, index: number) => {
         return (
           <RatingRow
             key={player.id}
