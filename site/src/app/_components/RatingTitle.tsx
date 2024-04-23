@@ -4,6 +4,9 @@ export function RatingTitle() {
       <div className="w-16 items-center">
         <p className="text-center">Rank</p>
       </div>
+      <div className="w-16 items-center">
+        <p className="text-center">↑↓</p>
+      </div>
       <div className="w-full items-center  px-1">
         <p className="text-left">Name</p>
       </div>
