@@ -1,10 +1,8 @@
-import { RatingTitle } from "./RatingTitle";
-import { RatingRow } from "./RatingRow";
-import { db } from "../../server/db";
+import "server-only";
+import { db } from "../db";
 import { sql } from "drizzle-orm";
-import { log } from "console";
 
-type Player = {
+export type PlayerForLeaderboard = {
   id: number;
   name: string;
   rating: number;
@@ -12,10 +10,11 @@ type Player = {
   rd: number;
   rating_change: number;
   total_match_count: number;
+  rankChange?: number;
 };
 
-export default async function RatingTable() {
-  let players: Player[] = await db.execute(sql`
+export async function getLeaderBoard(): Promise<PlayerForLeaderboard[]> {
+  return await db.execute(sql`
     SELECT
       p.id,
       p.name,
@@ -91,35 +90,4 @@ export default async function RatingTable() {
     ORDER BY
       pr.rating DESC
         `);
-  const oldOrder = players.slice(0).sort((a, b) => {
-    return b.last_rating - a.last_rating;
-  });
-  log(oldOrder[0], players[0]);
-  players = players.map((player, index) => {
-    const oldIndex = oldOrder.findIndex(
-      (oldPlayer) => oldPlayer.id === player.id,
-    );
-    return {
-      ...player,
-      rankChange: oldIndex - index,
-    };
-  });
-  return (
-    <div className="w-full px-96">
-      <RatingTitle />
-      {players.map((player: Player, index: number) => {
-        return (
-          <RatingRow
-            key={player.id}
-            rank={index + 1}
-            rankChange={player.rankChange}
-            name={player.name}
-            rating={Math.round(player.rating)}
-            rd={Math.round(player.rd)}
-            change={Math.round(player.rating_change)}
-          />
-        );
-      })}
-    </div>
-  );
 }
