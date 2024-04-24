@@ -11,7 +11,7 @@ export default function Title() {
             Leaderboard
           </a>
         </Link>
-        <Link href="/About" legacyBehavior>
+        <Link href="/about" legacyBehavior>
           <a className="rounded-md p-1 px-2 text-2xl font-semibold hover:underline">
             About
           </a>

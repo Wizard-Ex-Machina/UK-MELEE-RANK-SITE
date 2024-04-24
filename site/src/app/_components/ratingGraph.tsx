@@ -1,9 +1,8 @@
 import { Suspense } from "react";
-import Leaderboard from "./_components/Leaderboard";
-import TopPlayerGraph from "./_components/TopPlayerGraph";
-import { playersWithRanking } from "../server/queries/playersWithRatings";
+import TopPlayerGraph from "./TopPlayerGraph";
+import { playersWithRanking } from "../../server/queries/playersWithRatings";
 
-export default async function HomePage() {
+export default async function RatingGraph() {
   const players = await playersWithRanking();
   const showTop = 500;
   const data = {
@@ -34,12 +33,8 @@ export default async function HomePage() {
     ],
   };
   return (
-    <main className="flex min-h-screen flex-col items-center bg-zinc-900 p-8 text-white">
-      <div className="w-full px-96">
-        <Suspense>
-          <Leaderboard />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense>
+      <TopPlayerGraph {...data} />
+    </Suspense>
   );
 }

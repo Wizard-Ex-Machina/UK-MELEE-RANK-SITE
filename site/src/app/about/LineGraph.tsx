@@ -1,0 +1,16 @@
+"use client";
+import { Line } from "react-chartjs-2";
+import { Chart as ChartJS, registerables } from "chart.js"; // Import registerables from "chart.js"
+
+ChartJS.register(...registerables); // Register all elements and controllers
+type Props = {
+  data: any;
+  options: any;
+};
+export default function LineGraph(props: any) {
+  return (
+    <div className="mb-8 flex h-full w-full justify-center rounded-md bg-zinc-200 p-2">
+      <Line data={props.data} options={props.options} />
+    </div>
+  );
+}

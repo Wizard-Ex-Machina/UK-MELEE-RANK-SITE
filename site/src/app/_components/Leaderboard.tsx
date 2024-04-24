@@ -20,7 +20,7 @@ export default async function Leaderboard() {
     };
   });
   return (
-    <div className=" w-full px-96">
+    <>
       <RatingTitle />
       {players.map((player: PlayerForLeaderboard, index: number) => {
         return (
@@ -35,6 +35,6 @@ export default async function Leaderboard() {
           />
         );
       })}
-    </div>
+    </>
   );
 }

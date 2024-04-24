@@ -32,5 +32,9 @@ export default async function TopPlayerGraph(props: any) {
       },
     },
   };
-  return <Bar data={props} options={options} />;
+  return (
+    <div className="mb-8 flex h-full w-full justify-center rounded-md bg-zinc-200 p-2">
+      <Bar data={props} options={options} />
+    </div>
+  );
 }
