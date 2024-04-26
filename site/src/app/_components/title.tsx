@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function Title() {
   return (
-    <main className="items-left flex min-h-[36rem] flex-col justify-end bg-gradient-to-b from-amber-600 to-orange-700 p-4 text-white">
+    <main className="items-left flex min-h-[30rem] flex-col justify-end bg-gradient-to-b from-amber-600 to-orange-700 p-4 text-white lg:min-h-[36rem]">
       <h1 className="text-9xl font-black">UK</h1>
-      <h1 className="text-9xl font-black">MELEE RANKED</h1>
+      <h1 className="text-4xl font-black lg:text-9xl">MELEE RANKED</h1>
       <div className="items justify-left flex pt-2">
         <Link href="/" legacyBehavior>
           <a className="rounded-sm p-1 px-2 text-2xl font-semibold hover:underline">

@@ -9,8 +9,8 @@ import { log } from "console";
 export default async function About() {
   return (
     <main className="flex min-h-screen flex-col items-center bg-zinc-900 p-8 text-white">
-      <div className="flex w-full flex-col items-center justify-center px-96">
-        <article className="prose prose-invert w-3/5">
+      <div className="flex w-full flex-col items-center justify-center px-8 lg:px-96">
+        <article className="prose prose-invert lg:w-3/5">
           <h1>FAQ</h1>
           <h2>What is this?</h2>
           <p>
@@ -42,7 +42,9 @@ export default async function About() {
             either one of them could be the better player. However it is still
             usefull when looking at larger gaps in skill.
           </p>
-          <RatingGraph />
+          <div className="min-h-96">
+            <RatingGraph />
+          </div>
           <h2>What does x rating mean?</h2>
           <p>
             Below is a graph showing the expected win rate of a player with an

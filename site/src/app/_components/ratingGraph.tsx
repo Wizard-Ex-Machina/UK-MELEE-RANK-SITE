@@ -3,7 +3,7 @@ import TopPlayerGraph from "./TopPlayerGraph";
 import { playersWithRanking } from "../../server/queries/playersWithRatings";
 
 export default async function RatingGraph() {
-  const players = await playersWithRanking();
+  const players = (await playersWithRanking()).slice(0, 100);
   const showTop = 500;
   const data = {
     labels: players

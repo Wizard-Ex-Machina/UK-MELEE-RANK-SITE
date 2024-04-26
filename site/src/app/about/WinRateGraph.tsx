@@ -24,5 +24,16 @@ export default function WinRateGraph() {
       },
     ],
   };
-  return <LineGraph data={data} />;
+  const options = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Expected Win Rate",
+      },
+    },
+  };
+  return <LineGraph data={data} options={options} />;
 }

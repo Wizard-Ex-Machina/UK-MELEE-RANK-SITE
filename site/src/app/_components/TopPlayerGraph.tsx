@@ -20,6 +20,13 @@ ChartJS.register(
 );
 export default async function TopPlayerGraph(props: any) {
   const options = {
+    aspectRatio: false,
+    plugins: {
+      title: {
+        display: true,
+        text: "Rating Overlap",
+      },
+    },
     scales: {
       x: {
         stacked: true,
@@ -32,8 +39,9 @@ export default async function TopPlayerGraph(props: any) {
       },
     },
   };
+
   return (
-    <div className="mb-8 flex h-full w-full justify-center rounded-md bg-zinc-200 p-2">
+    <div className="mb-8 flex h-full min-h-96 w-full justify-center rounded-md bg-zinc-200 p-2">
       <Bar data={props} options={options} />
     </div>
   );

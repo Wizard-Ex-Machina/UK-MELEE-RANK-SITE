@@ -35,7 +35,7 @@ export default async function HomePage() {
   };
   return (
     <main className="flex min-h-screen flex-col items-center bg-zinc-900 p-8 text-white">
-      <div className="w-full px-96">
+      <div className="w-full lg:px-96">
         <Suspense>
           <Leaderboard />
         </Suspense>

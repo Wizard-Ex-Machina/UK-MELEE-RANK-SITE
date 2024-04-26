@@ -1,8 +1,12 @@
-import LineGraph from "./LineGraph";
+import { PlayerForLeaderboard } from "~/server/queries/leaderboard";
+import LineGraph from "../../about/LineGraph";
 import { playersWithRanking } from "~/server/queries/playersWithRatings";
 
-export default async function PlayerDistributionGraph() {
-  const players = await playersWithRanking();
+type Props = {
+  players: PlayerForLeaderboard[];
+};
+export default async function DistGraph(props: Props) {
+  const { players } = props;
   const data = {
     labels: Array.from({ length: 13 }).map((_, i) => 500 + (i + 1) * 130),
     datasets: [
@@ -10,7 +14,7 @@ export default async function PlayerDistributionGraph() {
         label: "Player Distribution",
         data: Array.from({ length: 13 }).map(
           (_, i) =>
-            players.filter((player) => {
+            players.filter((player: PlayerForLeaderboard) => {
               return (
                 player.rating >= 500 + (i + 1) * 130 &&
                 player.rating < 500 + (i + 2) * 130

@@ -4,6 +4,9 @@ import {
   getLeaderBoard,
   PlayerForLeaderboard,
 } from "~/server/queries/leaderboard";
+import { getMatchesForId } from "~/server/queries/getMatchesForID";
+import { getRatingsForId } from "~/server/queries/getRatingsForID";
+import { PlayerProfile } from "./PlayerProfile/PlayerProfile";
 
 export default async function Leaderboard() {
   let players: PlayerForLeaderboard[] = await getLeaderBoard();
@@ -19,20 +22,23 @@ export default async function Leaderboard() {
       rankChange: oldIndex - index,
     };
   });
+  let toggle = false;
+  function setToggle() {
+    toggle = !toggle;
+  }
   return (
     <>
       <RatingTitle />
-      {players.map((player: PlayerForLeaderboard, index: number) => {
+      {players.map(async (player: PlayerForLeaderboard, index: number) => {
         return (
-          <RatingRow
-            key={player.id}
-            rank={index + 1}
-            rankChange={player.rankChange ?? 0}
-            name={player.name}
-            rating={Math.round(player.rating)}
-            rd={Math.round(player.rd)}
-            change={Math.round(player.rating_change)}
-          />
+          <>
+            <RatingRow
+              key={player.id}
+              rank={index + 1}
+              player={player}
+              players={players}
+            />
+          </>
         );
       })}
     </>
