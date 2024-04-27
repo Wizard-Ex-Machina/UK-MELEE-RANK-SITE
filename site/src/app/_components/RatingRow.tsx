@@ -36,7 +36,7 @@ export function RatingRow(props: RatingRowProps) {
         className={"h8 flex w-full rounded-md p-1 " + colors[props.rank % 2]}
       >
         <div className="w-16 items-center">
-          <p className="text-center">{toggled}</p>
+          <p className="text-center">{props.rank}</p>
         </div>
         <div className="w-16 items-center">
           <p className={"text-center " + rankChangeColor}>

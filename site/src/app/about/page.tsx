@@ -22,9 +22,9 @@ export default async function About() {
           </p>
           <h2>When does it update?</h2>
           <p>
-            The site updates every 28 days to try and keep the data up to date
-            with enough matchs in each rating period to get a good rating for
-            each player.
+            The site updates on the first of every month to try and keep the
+            data up to date with enough matches in each rating period to get a
+            good rating for each player.
           </p>
           <h2>Why inculde weeklies?</h2>
           <p>
