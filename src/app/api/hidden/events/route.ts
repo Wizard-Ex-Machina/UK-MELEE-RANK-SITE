@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   return Response.json({ message: "done" });
 }
 
+export const dynamic = "force-dynamic";
 async function getEventsPage(page: number) {
   const options = {
     method: "POST",

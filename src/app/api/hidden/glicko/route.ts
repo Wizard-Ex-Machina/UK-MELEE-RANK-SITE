@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   await main();
   return Response.json({ message: "done" });
 }
+export const dynamic = "force-dynamic";
 
 async function createRatingsForPeriod(period: { start: string; end: string }) {
   log(`Creating ratings for period ${period.start} to ${period.end}`);

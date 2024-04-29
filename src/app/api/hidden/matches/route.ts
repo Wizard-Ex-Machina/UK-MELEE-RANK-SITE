@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   const data = await matchesFromEvents();
   return Response.json({ data });
 }
+export const dynamic = "force-dynamic";
 
 export async function matchesFromEvents() {
   const events = await getEvents();

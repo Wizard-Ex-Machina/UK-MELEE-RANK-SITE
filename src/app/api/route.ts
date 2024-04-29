@@ -2,6 +2,7 @@ import { log } from "console";
 import { getMatchesForId } from "~/server/queries/getMatchesForID";
 import { getRatingsForId } from "~/server/queries/getRatingsForID";
 
+export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
