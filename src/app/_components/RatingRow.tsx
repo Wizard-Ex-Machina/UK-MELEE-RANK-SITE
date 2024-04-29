@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useState } from "react";
-import { PlayerForLeaderboard } from "~/server/queries/leaderboard";
+import type { PlayerForLeaderboard } from "~/server/queries/leaderboard";
 import { PlayerProfile } from "./PlayerProfile/PlayerProfile";
 
 type RatingRowProps = {

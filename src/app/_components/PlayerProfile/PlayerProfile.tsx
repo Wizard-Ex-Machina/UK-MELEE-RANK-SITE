@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import LineGraph from "~/app/about/LineGraph";
-import { PlayerForLeaderboard } from "~/app/leaderboard/Leaderboard";
+import LineGraph from "../../about/LineGraph";
+import type { PlayerForLeaderboard } from "../../../server/queries/leaderboard";
 import DistGraph from "./DistGraph";
 
 type Props = {
@@ -26,8 +26,6 @@ export function PlayerProfile(props: Props) {
         return res.json();
       })
       .then((data) => {
-        // Assuming data is an object containing a key 'data' which holds your response
-        //
         setRatings(data.data.ratings);
         setMatches(data.data.matches);
         setLoading(false);
@@ -35,12 +33,15 @@ export function PlayerProfile(props: Props) {
       .catch((err) => {
         // Log or display the error message
         console.error("Error fetching data:", err.message);
-        setContent("Error fetching data:", err.message);
+        setContent([`Error fetching data: ${err.message}`]);
       });
-  }, []);
+  }, [id]);
 
-  if (isLoading) return <p>{content}</p>;
-  if (!data) return <p>No profile data</p>;
+  if (isLoading) return;
+  // Since `data` is defined below, we use `ratings` to check for profile data existence
+  if (!ratings.length) return;
+
+  // your graph data processing and rendering logic here
 
   const ratingHistory = {
     labels: ratings.map((rating) => {
