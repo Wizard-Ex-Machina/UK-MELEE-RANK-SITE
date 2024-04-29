@@ -55,7 +55,7 @@ export function RatingRow(props: RatingRowProps) {
           </p>
         </div>
         <div className="w-32 items-center  px-1">
-          <p className="text-center">{rd}</p>
+          <p className="text-center">{Math.round(rd)}</p>
         </div>
       </div>
       {toggled ? (
