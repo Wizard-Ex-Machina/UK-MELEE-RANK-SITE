@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  STARTGG_API_TOKEN: ${{ secrets.STARTGG_API_TOKEN }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
