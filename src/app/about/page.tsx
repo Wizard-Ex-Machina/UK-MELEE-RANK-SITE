@@ -22,6 +22,14 @@ export default async function About() {
             data up to date with enough matches in each rating period to get a
             good rating for each player.
           </p>
+          <h2>[Player] is not from the UK why are they on the list?</h2>
+          <p>
+            The inculdes all players that have played at least 35 sets in the UK
+            in the past year. This is to try and include all players that are
+            active in the UK scene and to avoid including players that are not
+            active in the UK scene, however, this does mean that some players
+            that are not from the UK are included.
+          </p>
           <h2>Why inculde weeklies?</h2>
           <p>
             A large part of the reason that I made this tool is to try to track
