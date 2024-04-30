@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function PlayerProfile(props: Props) {
-  const { id } = props.player;
+  const { id, rating } = props.player;
   const [matches, setMatches] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [content, setContent] = useState([]);
@@ -167,7 +167,7 @@ export function PlayerProfile(props: Props) {
       <div className="gap 4 grid w-full grid-cols-1 lg:grid-cols-3">
         <LineGraph data={ratingHistory} options={options} />
         <LineGraph data={data} options={options2} />
-        <DistGraph players={props.players} />
+        <DistGraph rating={Math.round(rating)} players={props.players} />
       </div>
     </div>
   );
