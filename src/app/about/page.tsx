@@ -1,10 +1,6 @@
-import { Suspense } from "react";
-import Leaderboard from "../_components/Leaderboard";
-import TopPlayerGraph from "../_components/TopPlayerGraph";
 import RatingGraph from "../_components/ratingGraph";
 import WinRateGraph from "./WinRateGraph";
 import PlayerDistributionGraph from "./PlayerDistributionGraph";
-import { log } from "console";
 
 export default async function About() {
   return (
@@ -16,9 +12,9 @@ export default async function About() {
           <p>
             This site tracks the glicko2 rating of all players that have ever
             played in a UK event that is listed on start GG. This means that the
-            first event that is inculded in the dataset is Kickstart 5 and for
+            first event that is included in the dataset is Kickstart 5 and for
             the first year or two of the data it is mostly just majors but later
-            weeklies and monthlies are included aswell.
+            weeklies and monthlies are included as well.
           </p>
           <h2>When does it update?</h2>
           <p>
@@ -28,19 +24,20 @@ export default async function About() {
           </p>
           <h2>Why inculde weeklies?</h2>
           <p>
-            A large part of the reason that I made this tool is to try track the
-            improvement of players over time especially those that are not top
-            players. As many players that I wish to track the progress of rarely
-            attend majors most of the data on them comes from weeklies instead.
+            A large part of the reason that I made this tool is to try to track
+            the improvement of players over time especially those that are not
+            top players. As many players that I wish to track the progress of
+            rarely attend majors most of the data on them comes from weeklies
+            instead.
           </p>
           <h2>Why is [Player] above [Player]?</h2>
           <p>
             All ratings have 2 parts to them the rating itself and the rd or
-            rating devation which is a measure of how confident we are in the
+            rating deviation which is a measure of how confident we are in the
             rating. When shown together on the chart below you can see that
-            there is a lot of overlap between players ratings and therefore
-            either one of them could be the better player. However it is still
-            usefull when looking at larger gaps in skill.
+            there is a lot of overlap between players' ratings and therefore
+            either one of them could be the better player. However, it is still
+            useful when looking at larger gaps in skill.
           </p>
           <div className="min-h-96">
             <RatingGraph />
@@ -59,34 +56,34 @@ export default async function About() {
           <p>He is simply that powerful.</p>
           <p>
             The real answer is, from what I can tell Tony Bomboni lost his
-            startGG acount and had to make a new one, this is why he is on the
-            list twice. It should reasolve itself over time as the old account
+            startGG account and had to make a new one, this is why he is on the
+            list twice. It should resolve itself over time as the old account
             will be removed from the list once it has dropped below the activity
             threshold.
           </p>
           <h2>Other Questions</h2>
           <p>
             If you have any other questions feel free to ask me @WizardExMachina
-            on twitter or discord
+            on Twitter or Discord
           </p>
           <h1>Future Goals</h1>
           <h2>Deeper integration with startGG</h2>
           <p>
-            I wish to provide a tool for TOs in the uk to try and help with
+            I wish to provide a tool for TOs in the UK to try and help with
             seeding players in pools. While I would expect that the top players
-            may require manual seeding I think that in lower tiers of players
+            may require manual seeding I think that in lower tiers of players,
             this tool could be very useful as they often go unseeded.
           </p>
           <p>
-            I also would like the tool to avoid having players that have played
-            a lot recently being in the same pool, such as players that attend
-            the same weeklies.
+            I also would like the tool to avoid having players who have played a
+            lot recently being in the same pool, such as players who attend the
+            same weeklies.
           </p>
           <h2>H2H stats</h2>
           <p>
-            I would also like to provide a tool to show the head to head stats
+            I would also like to provide a tool to show the head-to-head stats
             between 2 players and the way they have been trending over time.
-            These stats would inculde Game, BO3, and BO5 win rates their rating
+            These stats would include Game, BO3, and BO5 win rates their rating
             over time and a list of events that they faced each other at.
           </p>
         </article>
