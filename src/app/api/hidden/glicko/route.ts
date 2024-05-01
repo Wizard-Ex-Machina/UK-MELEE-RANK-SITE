@@ -7,6 +7,8 @@ import { getMatchesInPeriod } from "~/server/queries/getMatchesInPeriod";
 import { createPlayerRating } from "~/server/queries/createPlayerRating";
 import { getLatestRating } from "~/server/queries/getLatestPeriod";
 export async function GET(request: Request) {
+  if (headers().get("Authorization") !== env.SECRET_KEY)
+    return Response.json({ message: "Unauthorized" });
   await main();
   return Response.json({ message: "done" });
 }

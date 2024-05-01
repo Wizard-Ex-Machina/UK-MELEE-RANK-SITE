@@ -1,7 +1,10 @@
 import { createEvent, Event } from "~/server/queries/createEvent";
+import { headers } from "next/headers";
 import { env } from "~/env";
 
 export async function GET(request: Request) {
+  if (headers().get("Authorization") !== process.env.SECRET_KEY)
+    return Response.json({ message: "Unauthorized" });
   const data = await getEvents();
   return Response.json({ message: "done" });
 }
