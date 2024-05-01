@@ -41,3 +41,10 @@ jobs:
 
       - name: Deploy with rsync
         run: rsync -avz --delete . ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.TARGET_DIRECTORY }}
+
+      - name: Execute SSH commmands on remote server
+        uses: JimCronqvist/action-ssh@master
+        with:
+          hosts: ${{ secrets.USERNAME }}@${{ secrets.HOST }}
+          privateKey: ${{ secrets.PRIVATE_KEY }}
+          command: pm2 restart melee-ranked
