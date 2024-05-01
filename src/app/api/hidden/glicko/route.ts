@@ -95,7 +95,7 @@ async function main() {
   let startDate = new Date("2016-01-01");
 
   if (latest.length > 0) {
-    startDate = new Date(lastest[0].period);
+    startDate = new Date(latest[0].period);
   }
 
   const finalDate = new Date();
