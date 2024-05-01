@@ -34,13 +34,20 @@ async function getEventsPage(page: number) {
     }),
   };
 
+  //^(?!.*doubles).*melee.*
+
   const responseRaw = await fetch("https://api.start.gg/gql/alpha", options);
   const response: any = await responseRaw.json();
   try {
     response.data.tournaments.nodes.map(
       (tournament: any) =>
         !tournament.events.map((event: any) => {
-          if (new RegExp("MELEE.*SINGLES").test(event.name.toUpperCase())) {
+          if (
+            new RegExp("MELEE.*SINGLES").test(event.name.toUpperCase()) ||
+            new RegExp("(?!.*DOUBLES)(?!.*CREWS)(?!.*LADDER).*MELEE.*").test(
+              event.name.toUpperCase(),
+            )
+          ) {
             createEvent({
               tournament: tournament.name,
               id: tournament.id,
