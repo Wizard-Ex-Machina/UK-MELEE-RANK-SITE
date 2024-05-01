@@ -1,12 +1,14 @@
 import Bottleneck from "bottleneck";
 import { log } from "console";
+import { headers } from "next/headers";
+import { env } from "~/env";
 import { createMatch } from "~/server/queries/createMatch";
 import { createPlayer } from "~/server/queries/createPlayer";
 import { getEvents } from "~/server/queries/getEvents";
 import { getMatchesInEvent } from "~/server/queries/getMatchesInEvent";
 
 export async function GET(request: Request) {
-  if (headers().get("Authorization") !== env.SECRET_KEY)
+  if (headers().get("Authorization") !== process.env.SECRET_KEY)
     return Response.json({ message: "Unauthorized" });
   const data = await matchesFromEvents();
   return Response.json({ data });

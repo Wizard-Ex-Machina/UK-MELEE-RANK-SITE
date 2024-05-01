@@ -1,13 +1,14 @@
 import { log } from "console";
 import { Glicko2 } from "glicko2.ts";
-
+import { headers } from "next/headers";
+import { env } from "~/env";
 import { getplayersWithRatings } from "~/server/queries/GetMostRecentRatings";
 import { getMatchesInPeriod } from "~/server/queries/getMatchesInPeriod";
 
 import { createPlayerRating } from "~/server/queries/createPlayerRating";
 import { getLatestRating } from "~/server/queries/getLatestPeriod";
 export async function GET(request: Request) {
-  if (headers().get("Authorization") !== env.SECRET_KEY)
+  if (headers().get("Authorization") !== process.env.SECRET_KEY)
     return Response.json({ message: "Unauthorized" });
   await main();
   return Response.json({ message: "done" });
