@@ -1,7 +1,10 @@
 import { createEvent, Event } from "~/server/queries/createEvent";
+import { headers } from "next/headers";
 import { env } from "~/env";
 
 export async function GET(request: Request) {
+  if (headers().get("Authorization") !== process.env.SECRET_KEY)
+    return Response.json({ message: "Unauthorized" });
   const data = await getEvents();
   return Response.json({ message: "done" });
 }
@@ -34,13 +37,20 @@ async function getEventsPage(page: number) {
     }),
   };
 
+  //^(?!.*doubles).*melee.*
+
   const responseRaw = await fetch("https://api.start.gg/gql/alpha", options);
   const response: any = await responseRaw.json();
   try {
     response.data.tournaments.nodes.map(
       (tournament: any) =>
         !tournament.events.map((event: any) => {
-          if (new RegExp("MELEE.*SINGLES").test(event.name.toUpperCase())) {
+          if (
+            new RegExp("MELEE.*SINGLES").test(event.name.toUpperCase()) ||
+            new RegExp("(?!.*DOUBLES)(?!.*CREWS)(?!.*LADDER).*MELEE.*").test(
+              event.name.toUpperCase(),
+            )
+          ) {
             createEvent({
               tournament: tournament.name,
               id: tournament.id,

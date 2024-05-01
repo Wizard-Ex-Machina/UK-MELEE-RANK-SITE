@@ -6,6 +6,8 @@ import { getEvents } from "~/server/queries/getEvents";
 import { getMatchesInEvent } from "~/server/queries/getMatchesInEvent";
 
 export async function GET(request: Request) {
+  if (headers().get("Authorization") !== env.SECRET_KEY)
+    return Response.json({ message: "Unauthorized" });
   const data = await matchesFromEvents();
   return Response.json({ data });
 }
