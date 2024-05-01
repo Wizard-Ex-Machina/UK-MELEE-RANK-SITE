@@ -31,7 +31,7 @@ export default async function PlayerDistributionGraph() {
     scales: {
       y: {
         min: 0,
-        max: 40,
+        max: 90,
       },
     },
     plugins: {
