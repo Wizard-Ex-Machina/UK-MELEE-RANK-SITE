@@ -140,6 +140,8 @@ export function PlayerProfile(props: Props) {
           matches
             .filter((match) => match.end_at < rating.period)
             .map((match) => {
+              if (match.player_1_score === -1 || match.player_2_score === -1)
+                return;
               if (match.player_1_id === id) {
                 wins = wins + match.player_1_score;
               }
