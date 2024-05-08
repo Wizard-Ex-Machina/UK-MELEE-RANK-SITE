@@ -131,3 +131,14 @@ dist
 
 # Ignore db files
 rawdb/
+
+.nx/installation
+.nx/cache
+.nx/installation
+.nx/cache
+.nx/installation
+.nx/cache
+.nx/installation
+.nx/cache
+.nx/installation
+.nx/cache
