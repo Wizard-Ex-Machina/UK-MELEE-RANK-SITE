@@ -49,9 +49,8 @@ CREATE TABLE IF NOT EXISTS players (
 CREATE TABLE IF NOT EXISTS player_aliases (
   player_id int NOT NULL,
   start_gg_id int NOT NULL,
-  alias varchar(255) NOT NULL,
   FOREIGN KEY (player_id) REFERENCES players(player_id),
-  PRIMARY KEY (player_id, alias)
+  PRIMARY KEY (player_id, start_gg_id)
 );
 
 CREATE TABLE IF NOT EXISTS ratings (
