@@ -3,9 +3,10 @@ package main
 import (
 	"github.com/joho/godotenv"
   "api/internal/startgg"
+  "fmt"
 )
 
 func main() {
 	godotenv.Load()
-	startgg.GetEvents()
+	fmt.Print(startgg.GetMatches(14659))
 }

@@ -25,9 +25,11 @@ type Match struct {
 			Participants [] struct {
 				User struct {
 					Id int `json:"id"`
+					Player struct {
+						GamerTag string `json:"gamerTag"`
+					} `json:"player"`
 				} `json:"user"`
 			} `json:"participants"`
-			Name string `json:"name"`
 		} `json:"entrant"`
 		Standing struct {
 			Stats struct {
@@ -40,23 +42,23 @@ type Match struct {
 }
 
 
-func GetMatches(eventID int) []Placement {
+func GetMatches(eventID int) []Match {
 	pageLength := 1
 	page := 0
-	matches:= [] Placement{}
+	matches:= [] Match{}
 	for pageLength > 0 {
 			temp := getMatchesPage(eventID, page)
 			matches = append(matches, temp.Data.Event.Sets.Nodes...)
-			pageLength = len(temp.Data.Event.Standings.Nodes)
+			pageLength = len(temp.Data.Event.Sets.Nodes)
 			page += 1
 	}
-	return tournaments
+	return matches
 }
 
 func getMatchesPage(eventID int, page int) MatchRes {
 	url := "https://api.start.gg/gql/alpha"
 
-		payload := strings.NewReader("{\"query\":\"query EventSets($eventId: ID!, $page: Int!, $perPage: Int!) {\\n\\tevent(id: $eventId) {\\n\\t\\tsets(page: $page, perPage: $perPage, sortType: STANDARD) {\\n\\t\\t\\tnodes {\\n\\t\\t\\t\\tslots {\\n\\t\\t\\t\\t\\tentrant {\\n\\t\\t\\t\\t\\t\\tparticipants {\\n\\t\\t\\t\\t\\t\\t\\tuser {\\n\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\tname\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tstanding {\\n\\t\\t\\t\\t\\t\\tstats {\\n\\t\\t\\t\\t\\t\\t\\tscore {\\n\\t\\t\\t\\t\\t\\t\\t\\tvalue\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n}\\n\",\"operationName\":\"EventSets\",\"variables\":\"{\\n  \\\"eventId\\\": "+strconv.Itoa(eventID)+",\\n  \\\"page\\\": "+strconv.Itoa(page)+",\\n  \\\"perPage\\\": 54\\n}\"}")
+	payload := strings.NewReader("{\"query\":\"query EventSets($eventId: ID!, $page: Int!, $perPage: Int!) {\\n\\tevent(id: $eventId) {\\n\\t\\tsets(page: $page, perPage: $perPage, sortType: STANDARD) {\\n\\t\\t\\tnodes {\\n\\t\\t\\t\\tslots {\\n\\t\\t\\t\\t\\tentrant {\\n\\t\\t\\t\\t\\t\\tparticipants {\\n\\t\\t\\t\\t\\t\\t\\tuser {\\n\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\tplayer {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tgamerTag\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tstanding {\\n\\t\\t\\t\\t\\t\\tstats {\\n\\t\\t\\t\\t\\t\\t\\tscore {\\n\\t\\t\\t\\t\\t\\t\\t\\tvalue\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n}\\n\",\"operationName\":\"EventSets\",\"variables\":\"{\\n\\t\\\"eventId\\\": "+strconv.Itoa(eventID)+",\\n\\t\\\"page\\\": "+strconv.Itoa(page)+",\\n\\t\\\"perPage\\\": 45\\n}\"}")
 
 		req, _ := http.NewRequest("POST", url, payload)
 
