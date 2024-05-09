@@ -55,7 +55,7 @@ func getPlacementsPage(eventID int, page int) PlacemaentRes {
 	body := []byte(`{
 		"query": "query EventStandings($eventId: ID!, $page: Int!, $perPage: Int!) {\n  event(id: $eventId) {\n    id\n    name\n    standings(query: {\n      perPage: $perPage,\n      page: $page\n    }){\n      nodes {\n        placement\n        entrant {\n          participants {\n              user {\n                id\n                player {\n                  gamerTag\n                }\n              }\n            }\n        }\n      }\n    }\n  }\n}",
 		"operationName": "EventStandings",
-		"variables": "{\n  \"eventId\":`+ strconv.Itoa(eventID) +`,\n  \"page\":`+strconv.Itoa(page)+`,\n  \"perPage\": 195}"
+		"variables": "{\n  \"eventId\":`+ strconv.Itoa(eventID) +`,\n  \"page\":` + strconv.Itoa(page) + `,\n  \"perPage\": 195}"
 }`)
 	r, err := http.NewRequest("POST", posturl, bytes.NewBuffer(body))
 	if err != nil {
