@@ -14,6 +14,12 @@ CREATE TABLE IF NOT EXISTS events (
   FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
 );
 
+CREATE TABLE IF NOT EXISTS players (
+  player_id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  first_appearance date NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS placements (
   event_id int NOT NULL,
   player_id int NOT NULL,
@@ -40,15 +46,10 @@ CREATE TABLE IF NOT EXISTS match_slot (
   PRIMARY KEY (match_id, player_id)
 );
 
-CREATE TABLE IF NOT EXISTS players (
-  player_id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL,
-  first_appearance date NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS player_aliases (
   player_id int NOT NULL,
-  start_gg_id int NOT NULL,
+  start_gg_id int NOT NULL UNIQUE,
   FOREIGN KEY (player_id) REFERENCES players(player_id),
   PRIMARY KEY (player_id, start_gg_id)
 );
