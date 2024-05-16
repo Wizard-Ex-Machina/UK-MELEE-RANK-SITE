@@ -5,8 +5,7 @@
 package postgres
 
 import (
-	"database/sql"
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Event struct {
@@ -38,7 +37,7 @@ type Placement struct {
 type Player struct {
 	PlayerID        int32
 	Name            string
-	FirstAppearance time.Time
+	FirstAppearance pgtype.Date
 }
 
 type PlayerAlias struct {
@@ -51,13 +50,13 @@ type Rating struct {
 	Rating   float64
 	Rd       float64
 	Sigma    float64
-	Date     time.Time
+	Date     pgtype.Date
 }
 
 type Tournament struct {
 	TournamentID int32
 	Name         string
-	Postcode     sql.NullString
-	EndAt        time.Time
+	Postcode     pgtype.Text
+	EndAt        pgtype.Date
 	Slug         string
 }

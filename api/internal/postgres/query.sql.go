@@ -7,8 +7,8 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createEvent = `-- name: CreateEvent :one
@@ -23,7 +23,7 @@ type CreateEventParams struct {
 
 // This query will fail if the tournament_id does not exist
 func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error) {
-	row := q.db.QueryRowContext(ctx, createEvent, arg.Name, arg.StartGgID, arg.TournamentID)
+	row := q.db.QueryRow(ctx, createEvent, arg.Name, arg.StartGgID, arg.TournamentID)
 	var i Event
 	err := row.Scan(
 		&i.EventID,
@@ -46,7 +46,7 @@ type CreateMatchParams struct {
 // This query will fail if the event_id does not exist
 // This query will fail if the start_gg_id already exists
 func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (Match, error) {
-	row := q.db.QueryRowContext(ctx, createMatch, arg.EventID, arg.StartGgID)
+	row := q.db.QueryRow(ctx, createMatch, arg.EventID, arg.StartGgID)
 	var i Match
 	err := row.Scan(&i.MatchID, &i.EventID, &i.StartGgID)
 	return i, err
@@ -67,7 +67,7 @@ type CreateMatchSlotParams struct {
 // This query will fail if the player_id does not exist
 // This query will fail if the player_id is already in the match
 func (q *Queries) CreateMatchSlot(ctx context.Context, arg CreateMatchSlotParams) (MatchSlot, error) {
-	row := q.db.QueryRowContext(ctx, createMatchSlot,
+	row := q.db.QueryRow(ctx, createMatchSlot,
 		arg.MatchID,
 		arg.PlayerID,
 		arg.Score,
@@ -97,7 +97,7 @@ type CreatePlacementParams struct {
 // This query will fail if the player_id does not exist
 // This query will fail if the player_id is already in the event
 func (q *Queries) CreatePlacement(ctx context.Context, arg CreatePlacementParams) (Placement, error) {
-	row := q.db.QueryRowContext(ctx, createPlacement, arg.EventID, arg.PlayerID, arg.Placement)
+	row := q.db.QueryRow(ctx, createPlacement, arg.EventID, arg.PlayerID, arg.Placement)
 	var i Placement
 	err := row.Scan(&i.EventID, &i.PlayerID, &i.Placement)
 	return i, err
@@ -109,11 +109,11 @@ INSERT INTO players (name, first_appearance) VALUES ($1, $2) RETURNING player_id
 
 type CreatePlayerParams struct {
 	Name            string
-	FirstAppearance time.Time
+	FirstAppearance pgtype.Date
 }
 
 func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
-	row := q.db.QueryRowContext(ctx, createPlayer, arg.Name, arg.FirstAppearance)
+	row := q.db.QueryRow(ctx, createPlayer, arg.Name, arg.FirstAppearance)
 	var i Player
 	err := row.Scan(&i.PlayerID, &i.Name, &i.FirstAppearance)
 	return i, err
@@ -130,7 +130,7 @@ type CreatePlayerAliasParams struct {
 
 // This query will fail if the player_id does not exist
 func (q *Queries) CreatePlayerAlias(ctx context.Context, arg CreatePlayerAliasParams) (PlayerAlias, error) {
-	row := q.db.QueryRowContext(ctx, createPlayerAlias, arg.PlayerID, arg.StartGgID)
+	row := q.db.QueryRow(ctx, createPlayerAlias, arg.PlayerID, arg.StartGgID)
 	var i PlayerAlias
 	err := row.Scan(&i.PlayerID, &i.StartGgID)
 	return i, err
@@ -145,13 +145,13 @@ type CreateRatingParams struct {
 	Rating   float64
 	Rd       float64
 	Sigma    float64
-	Date     time.Time
+	Date     pgtype.Date
 }
 
 // This query will fail if the player_id does not exist
 // This query will fail if the player_id is already has a rating for that period
 func (q *Queries) CreateRating(ctx context.Context, arg CreateRatingParams) (Rating, error) {
-	row := q.db.QueryRowContext(ctx, createRating,
+	row := q.db.QueryRow(ctx, createRating,
 		arg.PlayerID,
 		arg.Rating,
 		arg.Rd,
@@ -177,14 +177,14 @@ RETURNING tournament_id, name, postcode, end_at, slug
 
 type CreateTournamentParams struct {
 	Name     string
-	Postcode sql.NullString
-	EndAt    time.Time
+	Postcode pgtype.Text
+	EndAt    pgtype.Date
 	Slug     string
 }
 
 // This query will fail if the slug already exists
 func (q *Queries) CreateTournament(ctx context.Context, arg CreateTournamentParams) (Tournament, error) {
-	row := q.db.QueryRowContext(ctx, createTournament,
+	row := q.db.QueryRow(ctx, createTournament,
 		arg.Name,
 		arg.Postcode,
 		arg.EndAt,
@@ -206,7 +206,7 @@ SELECT player_id, start_gg_id FROM player_aliases WHERE start_gg_id = $1
 `
 
 func (q *Queries) GetPlayerAliase(ctx context.Context, startGgID int32) (PlayerAlias, error) {
-	row := q.db.QueryRowContext(ctx, getPlayerAliase, startGgID)
+	row := q.db.QueryRow(ctx, getPlayerAliase, startGgID)
 	var i PlayerAlias
 	err := row.Scan(&i.PlayerID, &i.StartGgID)
 	return i, err
@@ -218,7 +218,7 @@ SELECT player_id, name, first_appearance FROM players WHERE player_id = (SELECT 
 
 // This query will fail if the start_gg_id does not exist
 func (q *Queries) GetPlayerFromAlias(ctx context.Context, startGgID int32) (Player, error) {
-	row := q.db.QueryRowContext(ctx, getPlayerFromAlias, startGgID)
+	row := q.db.QueryRow(ctx, getPlayerFromAlias, startGgID)
 	var i Player
 	err := row.Scan(&i.PlayerID, &i.Name, &i.FirstAppearance)
 	return i, err
@@ -229,7 +229,7 @@ SELECT player_id, name, first_appearance FROM players
 `
 
 func (q *Queries) GetPlayers(ctx context.Context) ([]Player, error) {
-	rows, err := q.db.QueryContext(ctx, getPlayers)
+	rows, err := q.db.Query(ctx, getPlayers)
 	if err != nil {
 		return nil, err
 	}
@@ -241,9 +241,6 @@ func (q *Queries) GetPlayers(ctx context.Context) ([]Player, error) {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

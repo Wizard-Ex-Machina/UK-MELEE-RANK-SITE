@@ -1,11 +1,11 @@
 package startgg
 
 import (
-	"bytes"
 	"net/http"
-	"fmt"
+	"strings"
   "log"
   "io"
+  "strconv"
   "encoding/json"
   "api/internal/config"
 )
@@ -19,6 +19,7 @@ type eventRes struct {
 }
 
 type Tournaments struct {
+	Slug string `json:"slug"`
 	Id int `json:"id"`
 	Name string `json:"name"`
 	CountryCode string `json:"countryCode"`
@@ -49,23 +50,17 @@ func GetEvents() []Tournaments {
 }
 
 func getEventsPage(page int) eventRes {
-	posturl := "https://api.start.gg/gql/alpha"
-	body := []byte(fmt.Sprintf(`{
-		"query": "query (, $page: Int!) {\n  tournaments(\n    query: {page: $page, perPage:  250, filter: {past: true, countryCode: \"GB\", videogameIds: [1]} }\n  ) {\n    nodes {\n      id\n      name\n      countryCode\n      events {\n        name\n        id\n      }\n      numAttendees\n      endAt\n      postalCode\n    }\n  }\n}\n\n",
-		"variables": {
-			"page": %d
-		}
-}`, page))
-	r, err := http.NewRequest("POST", posturl, bytes.NewBuffer(body))
-	if err != nil {
-		panic(err)
-	}
-	r.Header.Add("Authorization", "Bearer " + config.STARTGG_API_TOKEN())
-	client := &http.Client{}
-		res, err := client.Do(r)
-		if err != nil {
-			panic(err)
-		}
+	url := "https://api.start.gg/gql/alpha"
+
+		payload := strings.NewReader("{\"query\":\"query (, $page: Int!) {\\n  tournaments(\\n    query: {page: $page, perPage:  150, filter: {past: true, countryCode: \\\"GB\\\", videogameIds: [1]} }\\n  ) {\\n    nodes {\\n\\t\\t\\tslug\\n      id\\n      name\\n      countryCode\\n      events {\\n        name\\n        id\\n\\t\\t\\t\\tvideogame {\\n\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t}\\n      }\\n      numAttendees\\n      endAt\\n      postalCode\\n    }\\n  }\\n}\\n\\n\",\"variables\":{\"page\":" + strconv.Itoa(page) + "}}")
+
+		req, _ := http.NewRequest("POST", url, payload)
+
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer " + config.STARTGG_API_TOKEN())
+
+		res, _ := http.DefaultClient.Do(req)
+
 		defer res.Body.Close()
 		responseData, err := io.ReadAll(res.Body)
     if err != nil {
