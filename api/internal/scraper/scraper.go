@@ -6,7 +6,8 @@ import (
 	"api/internal/startgg"
 	"context"
 	"fmt"
-	"strconv"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -26,12 +27,20 @@ func Scraper() {
 	for _, tournament := range events {
 		dbTournament, err := queries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true}, Slug: tournament.Slug, EndAt: pgtype.Date{Time: time.Unix(int64(tournament.EndAt), 0), Valid: true}})
 		if err != nil {
-			fmt.Println("Fuck:" + tournament.Slug)
+			fmt.Println(err)
 		}
-		fmt.Println(strconv.FormatInt(int64(dbTournament.TournamentID), 10) + " " + dbTournament.Name)
-		// for _, event := range tournement.Events {
-		// 	fmt.Println(tournement.Name + " " + event.Name)
-		// }
+
+		if err == nil {
+			for _, event := range tournament.Events {
+				if event.Videogame.Id == 1 && (slices.Contains([]string{"MELEE", "SINGLES", "SUPER SMASH BROS. MELEE", "SUPER SMASH BROS. MELEE - SINGLES"}, strings.ToUpper(event.Name)) || strings.Contains(strings.ToUpper(event.Name), "MELEE SINGLES")) {
+					_, err := queries.CreateEvent(ctx, postgres.CreateEventParams{Name: event.Name, TournamentID: dbTournament.TournamentID, StartGgID: int32(event.Id)})
+					if err != nil {
+						fmt.Println(err)
+						fmt.Println(tournament.Name, event.Name)
+					}
+				}
+			}
+		}
 	}
 	defer db.Close(ctx)
 

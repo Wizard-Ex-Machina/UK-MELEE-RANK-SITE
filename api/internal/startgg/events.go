@@ -24,8 +24,11 @@ type Tournaments struct {
 	Name        string `json:"name"`
 	CountryCode string `json:"countryCode"`
 	Events      []struct {
-		Name string `json:"name"`
-		Id   int    `json:"id"`
+		Name      string `json:"name"`
+		Id        int    `json:"id"`
+		Videogame struct {
+			Id int `json:"id"`
+		} `json:"videogame"`
 	} `json:"events"`
 	NumAttendees int    `json:"numAttendees"`
 	EndAt        int    `json:"endAt"`
