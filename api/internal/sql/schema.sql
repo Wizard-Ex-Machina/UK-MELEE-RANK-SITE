@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS tournaments (
   name varchar(255) NOT NULL,
   postcode varchar(8),
   end_at date NOT NULL,
-  slug varchar(255) NOT NULL
+  slug varchar(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS events (

@@ -1,8 +1,9 @@
 package main
 
 import (
+	"api/internal/scraper"
+
 	"github.com/joho/godotenv"
-  "api/internal/scraper"
 )
 
 func main() {
