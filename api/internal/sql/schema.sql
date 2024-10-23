@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS match_slot (
   player_id int NOT NULL,
   score int NOT NULL,
   win BOOLEAN NOT NULL,
+  mu NUMERIC NOT NULL,
+  sigma NUMERIC NOT NULL,
+  delta NUMERIC NOT NULL,
   FOREIGN KEY (match_id) REFERENCES matches(match_id),
   FOREIGN KEY (player_id) REFERENCES players(player_id),
   PRIMARY KEY (match_id, player_id)
