@@ -58,7 +58,7 @@ func Scraper() {
 
 							fmt.Println(strconv.Itoa(i) + "/" + strconv.Itoa(len(events)) + "	" + tournament.Name + ":" + strconv.Itoa(len(matches)))
 							for _, match := range matches {
-								if (len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants)) == 2 && match.Slots[1].Standing.Stats.Score.Value != -1 && match.Slots[0].Standing.Stats.Score.Value != -1 {
+								if MatchConditions(match) {
 
 									//Get players from database
 									//Create New Players if they don't exist
@@ -94,6 +94,10 @@ func Scraper() {
 	}
 	defer db.Close(ctx)
 
+}
+
+func MatchConditions(match startgg.Match) bool {
+	return (len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants)) == 2 && match.Slots[1].Standing.Stats.Score.Value != -1 && match.Slots[0].Standing.Stats.Score.Value != -1
 }
 
 func SaveMatchSlot(ctx context.Context, queries *postgres.Queries, score int, win bool, player postgres.Player, rating *glicko.Player, match postgres.Match, oldRating float64) (postgres.MatchSlot, error) {
