@@ -35,25 +35,20 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event
 }
 
 const createMatch = `-- name: CreateMatch :one
-INSERT INTO matches (event_id, start_gg_id) VALUES ($1, $2) RETURNING match_id, event_id, start_gg_id
+INSERT INTO matches (event_id) VALUES ($1) RETURNING match_id, event_id
 `
-
-type CreateMatchParams struct {
-	EventID   int32
-	StartGgID string
-}
 
 // This query will fail if the event_id does not exist
 // This query will fail if the start_gg_id already exists
-func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (Match, error) {
-	row := q.db.QueryRow(ctx, createMatch, arg.EventID, arg.StartGgID)
+func (q *Queries) CreateMatch(ctx context.Context, eventID int32) (Match, error) {
+	row := q.db.QueryRow(ctx, createMatch, eventID)
 	var i Match
-	err := row.Scan(&i.MatchID, &i.EventID, &i.StartGgID)
+	err := row.Scan(&i.MatchID, &i.EventID)
 	return i, err
 }
 
 const createMatchSlot = `-- name: CreateMatchSlot :one
-INSERT INTO match_slot (match_id, player_id, score, win) VALUES ($1, $2, $3, $4) RETURNING match_id, player_id, score, win
+INSERT INTO match_slot (match_id, player_id, score, win, r, rd, sigma, delta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING match_id, player_id, score, win, r, rd, sigma, delta
 `
 
 type CreateMatchSlotParams struct {
@@ -61,6 +56,10 @@ type CreateMatchSlotParams struct {
 	PlayerID int32
 	Score    int32
 	Win      bool
+	R        pgtype.Numeric
+	Rd       pgtype.Numeric
+	Sigma    pgtype.Numeric
+	Delta    pgtype.Numeric
 }
 
 // This query will fail if the match_id does not exist
@@ -72,6 +71,10 @@ func (q *Queries) CreateMatchSlot(ctx context.Context, arg CreateMatchSlotParams
 		arg.PlayerID,
 		arg.Score,
 		arg.Win,
+		arg.R,
+		arg.Rd,
+		arg.Sigma,
+		arg.Delta,
 	)
 	var i MatchSlot
 	err := row.Scan(
@@ -79,6 +82,10 @@ func (q *Queries) CreateMatchSlot(ctx context.Context, arg CreateMatchSlotParams
 		&i.PlayerID,
 		&i.Score,
 		&i.Win,
+		&i.R,
+		&i.Rd,
+		&i.Sigma,
+		&i.Delta,
 	)
 	return i, err
 }
@@ -201,6 +208,34 @@ func (q *Queries) CreateTournament(ctx context.Context, arg CreateTournamentPara
 	return i, err
 }
 
+const getMostRecentTournament = `-- name: GetMostRecentTournament :one
+SELECT
+    tournament_id,
+    name,
+    postcode,
+    end_at,
+    slug
+FROM
+    tournaments
+ORDER BY
+    end_at DESC
+LIMIT 1
+`
+
+// This query will fail if there are no tournaments
+func (q *Queries) GetMostRecentTournament(ctx context.Context) (Tournament, error) {
+	row := q.db.QueryRow(ctx, getMostRecentTournament)
+	var i Tournament
+	err := row.Scan(
+		&i.TournamentID,
+		&i.Name,
+		&i.Postcode,
+		&i.EndAt,
+		&i.Slug,
+	)
+	return i, err
+}
+
 const getPlayerAliase = `-- name: GetPlayerAliase :one
 SELECT player_id, start_gg_id FROM player_aliases WHERE start_gg_id = $1
 `
@@ -246,4 +281,46 @@ func (q *Queries) GetPlayers(ctx context.Context) ([]Player, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getRating = `-- name: GetRating :one
+SELECT
+    ms.match_id,
+    ms.player_id,
+    ms.score,
+    ms.win,
+    ms.r,
+    ms.rd,
+    ms.sigma,
+    ms.delta
+FROM
+    match_slot ms
+JOIN
+    matches m ON ms.match_id = m.match_id
+JOIN
+    events e ON m.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+WHERE
+    ms.player_id = $1
+ORDER BY
+    t.end_at DESC
+LIMIT 1
+`
+
+// This query will fail if the player_id does not exist
+func (q *Queries) GetRating(ctx context.Context, playerID int32) (MatchSlot, error) {
+	row := q.db.QueryRow(ctx, getRating, playerID)
+	var i MatchSlot
+	err := row.Scan(
+		&i.MatchID,
+		&i.PlayerID,
+		&i.Score,
+		&i.Win,
+		&i.R,
+		&i.Rd,
+		&i.Sigma,
+		&i.Delta,
+	)
+	return i, err
 }

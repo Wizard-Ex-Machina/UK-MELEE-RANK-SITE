@@ -37,7 +37,7 @@ type Tournaments struct {
 
 func GetEvents() []Tournaments {
 	pageLength := 1
-	page := 0
+	page := 1
 	tournaments := []Tournaments{}
 	for pageLength > 0 {
 
@@ -45,7 +45,6 @@ func GetEvents() []Tournaments {
 		tournaments = append(tournaments, temp.Data.Tournaments.Nodes...)
 		pageLength = len(temp.Data.Tournaments.Nodes)
 		page += 1
-		pageLength = 0
 	}
 	return tournaments
 }
@@ -69,6 +68,5 @@ func getEventsPage(page int) eventRes {
 	}
 	var responseObject eventRes
 	json.Unmarshal(responseData, &responseObject)
-
 	return responseObject
 }

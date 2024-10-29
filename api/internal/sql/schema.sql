@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS tournaments (
   slug varchar(255) NOT NULL UNIQUE
 );
 
+
 CREATE TABLE IF NOT EXISTS events (
   event_id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
@@ -32,7 +33,6 @@ CREATE TABLE IF NOT EXISTS placements (
 CREATE TABLE IF NOT EXISTS matches (
   match_id SERIAL PRIMARY KEY,
   event_id int NOT NULL,
-  start_gg_id VARCHAR(255) NOT NULL UNIQUE,
   FOREIGN KEY (event_id) REFERENCES events(event_id)
 );
 
@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS match_slot (
   player_id int NOT NULL,
   score int NOT NULL,
   win BOOLEAN NOT NULL,
-  mu NUMERIC NOT NULL,
+  r NUMERIC NOT NULL,
+  rd NUMERIC NOT NULL,
   sigma NUMERIC NOT NULL,
   delta NUMERIC NOT NULL,
   FOREIGN KEY (match_id) REFERENCES matches(match_id),

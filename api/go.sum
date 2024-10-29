@@ -1,3 +1,5 @@
+github.com/ShewkShewk/go-glicko2 v0.1.1 h1:q9j0NqZZm2gTdaOwFqKM2zwVM4JIJtkRYom6HTP6YwI=
+github.com/ShewkShewk/go-glicko2 v0.1.1/go.mod h1:MupGdvr3D8PShIjuHS6URTUPlWIiyH2WqYlVbdVH83M=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fasmat/trueskill v0.0.0-20160629204156-1fc9949cfd18 h1:jAmpIr0QagOZUYanWSUcnMZ69OcQjsZj/+smHgD+usw=
 github.com/fasmat/trueskill v0.0.0-20160629204156-1fc9949cfd18/go.mod h1:mupwu6gk5lql4Rns8GmxKqXURIbTe4KMVWLMqv3Nsz0=

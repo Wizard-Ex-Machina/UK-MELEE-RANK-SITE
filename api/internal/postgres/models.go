@@ -16,9 +16,8 @@ type Event struct {
 }
 
 type Match struct {
-	MatchID   int32
-	EventID   int32
-	StartGgID string
+	MatchID int32
+	EventID int32
 }
 
 type MatchSlot struct {
@@ -26,6 +25,10 @@ type MatchSlot struct {
 	PlayerID int32
 	Score    int32
 	Win      bool
+	R        pgtype.Numeric
+	Rd       pgtype.Numeric
+	Sigma    pgtype.Numeric
+	Delta    pgtype.Numeric
 }
 
 type Placement struct {
