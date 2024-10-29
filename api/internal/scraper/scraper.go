@@ -7,6 +7,7 @@ import (
 	"cmp"
 	"context"
 	"fmt"
+	"log"
 	"slices"
 	"strconv"
 	"strings"
@@ -78,8 +79,11 @@ func Scraper() {
 
 									dbMatch, _ := queries.CreateMatch(ctx, dbEvent.EventID)
 
-									SaveMatchSlot(ctx, queries, match.Slots[0].Standing.Stats.Score.Value, match.Slots[0].Standing.Stats.Score.Value > match.Slots[1].Standing.Stats.Score.Value, player1, glickoPlayer1, dbMatch, oldRating1)
-									SaveMatchSlot(ctx, queries, match.Slots[1].Standing.Stats.Score.Value, match.Slots[1].Standing.Stats.Score.Value > match.Slots[0].Standing.Stats.Score.Value, player2, glickoPlayer2, dbMatch, oldRating2)
+									_, err := SaveMatchSlot(ctx, queries, match.Slots[0].Standing.Stats.Score.Value, match.Slots[0].Standing.Stats.Score.Value > match.Slots[1].Standing.Stats.Score.Value, player1, glickoPlayer1, dbMatch, oldRating1)
+									_, err2 := SaveMatchSlot(ctx, queries, match.Slots[1].Standing.Stats.Score.Value, match.Slots[1].Standing.Stats.Score.Value > match.Slots[0].Standing.Stats.Score.Value, player2, glickoPlayer2, dbMatch, oldRating2)
+									if err != nil || err2 != nil {
+										log.Println(err)
+									}
 								}
 							}
 						}
@@ -92,12 +96,12 @@ func Scraper() {
 
 }
 
-func SaveMatchSlot(ctx context.Context, queries *postgres.Queries, score int, win bool, player postgres.Player, rating *glicko.Player, match postgres.Match, oldRating float64) {
-	_, err := queries.CreateMatchSlot(ctx, postgres.CreateMatchSlotParams{MatchID: match.MatchID, PlayerID: player.PlayerID, Score: int32(score), Win: win, R: ConvertFloatToPgtypeNumeric(rating.Rating().R()), Rd: ConvertFloatToPgtypeNumeric(rating.Rating().Rd()), Sigma: ConvertFloatToPgtypeNumeric(rating.Rating().Sigma()), Delta: ConvertFloatToPgtypeNumeric(rating.Rating().R() - oldRating)})
+func SaveMatchSlot(ctx context.Context, queries *postgres.Queries, score int, win bool, player postgres.Player, rating *glicko.Player, match postgres.Match, oldRating float64) (postgres.MatchSlot, error) {
+	wait, err := queries.CreateMatchSlot(ctx, postgres.CreateMatchSlotParams{MatchID: match.MatchID, PlayerID: player.PlayerID, Score: int32(score), Win: win, R: ConvertFloatToPgtypeNumeric(rating.Rating().R()), Rd: ConvertFloatToPgtypeNumeric(rating.Rating().Rd()), Sigma: ConvertFloatToPgtypeNumeric(rating.Rating().Sigma()), Delta: ConvertFloatToPgtypeNumeric(rating.Rating().R() - oldRating)})
 	if err != nil {
-		fmt.Println(err)
+		return wait, err
 	}
-
+	return wait, nil
 }
 
 func ConvertFloatToPgtypeNumeric(f float64) pgtype.Numeric {
