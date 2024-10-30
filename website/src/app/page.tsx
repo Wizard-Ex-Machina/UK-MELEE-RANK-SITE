@@ -1,45 +1,33 @@
-import { Suspense } from "react";
-import Leaderboard from "./_components/Leaderboard";
-import TopPlayerGraph from "./_components/TopPlayerGraph";
-import { playersWithRanking } from "../server/queries/playersWithRatings";
+import Image from "next/image";
+import Link from "next/link";
+import { playfair_dislpay, bebas_neue } from "./fonts";
 
-export default async function HomePage() {
-  const players = await playersWithRanking();
-  const showTop = 500;
-  const data = {
-    labels: players
-      .slice(0, showTop)
-      .map((player, index) => index + 1 + " " + player.name),
-    datasets: [
-      {
-        label: "66% Confidence",
-        data: players.slice(0, showTop).map((player) => {
-          return [
-            Math.round(player.rating) - Math.round(player.rd),
-            Math.round(player.rating) + Math.round(player.rd),
-          ];
-        }),
-        backgroundColor: ["#4ade80"],
-      },
-      {
-        label: "95% Confidence",
-        data: players.slice(0, showTop).map((player) => {
-          return [
-            Math.round(player.rating) - Math.round(player.rd) * 2,
-            Math.round(player.rating) + Math.round(player.rd) * 2,
-          ];
-        }),
-        backgroundColor: ["#15803d"],
-      },
-    ],
-  };
+export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center bg-zinc-900 p-8 text-white">
-      <div className="w-full lg:px-96">
-        <Suspense>
-          <Leaderboard />
-        </Suspense>
+    <div className=" items-center justify-items-center min-h-screen ">
+      <div className="text-left px-8 pt-32 bg-gradient-to-b from-teal-600 to-cyan-900">
+        <h1 className="text-8xl font-bold">Wizard Ex Machina Presents…</h1>
+        <h1 className={`text-7xl font-bold ${playfair_dislpay.className}`}>
+          A Glicko2 Ranking Of People That Sometimes Play Melee In The UK
+        </h1>
+        <div className="items justify-left flex pt-2">
+          <Link href="/" legacyBehavior>
+            <a className="rounded-sm mr-2 my-2 text-2xl font-semibold hover:underline">
+              Leaderboard
+            </a>
+          </Link>
+          <Link href="/stats" legacyBehavior>
+            <a className="rounded-md mr-2 my-2 text-2xl font-semibold hover:underline">
+              Stats
+            </a>
+          </Link>
+          <Link href="/about" legacyBehavior>
+            <a className="rounded-md mr-2 my-2  text-2xl font-semibold hover:underline">
+              About
+            </a>
+          </Link>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
