@@ -1,17 +1,6 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Bebas_Neue } from "next/font/google";
 import "./globals.css";
-
-const playfair_dislpay = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const bebas_neue = Bebas_Neue({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
+import { space_mono } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${playfair_dislpay.className} ${bebas_neue.className} antialiased`}
-      >
+      <body className={`${space_mono.className} antialiased bg-zinc-800`}>
         {children}
       </body>
     </html>

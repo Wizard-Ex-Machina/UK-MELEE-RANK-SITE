@@ -85,3 +85,154 @@ FROM
 ORDER BY
     end_at DESC
 LIMIT 1;
+
+-- name: CurrentLeaderboard :many
+WITH recent_matches AS (
+    -- Filter matches from tournaments that ended at least one week ago
+    SELECT
+        ms.player_id,
+        ms.r,
+        ms.rd,
+        ms.match_id
+    FROM
+        match_slot ms
+    JOIN
+        matches m ON ms.match_id = m.match_id
+    JOIN
+        events e ON m.event_id = e.event_id
+    JOIN
+        tournaments t ON e.tournament_id = t.tournament_id
+    WHERE
+        t.end_at >= (CURRENT_DATE - INTERVAL '1 year')  -- Only consider tournaments from the last year
+),
+
+player_match_counts AS (
+    -- Count matches in the past year plus one week per player and filter to those with at least 30 matches
+    SELECT
+        player_id,
+        COUNT(*) AS match_count
+    FROM
+        recent_matches
+    GROUP BY
+        player_id
+    HAVING
+        COUNT(*) >= 30
+),
+
+latest_ratings AS (
+    -- Get the latest rating and RD for each player based on their most recent match_id
+    SELECT
+        rm.player_id,
+        rm.r AS latest_rating,
+        rm.rd AS latest_rd
+    FROM
+        recent_matches rm
+    JOIN
+        (SELECT player_id, MAX(match_id) AS max_match_id
+         FROM recent_matches
+         GROUP BY player_id) latest
+         ON rm.player_id = latest.player_id
+         AND rm.match_id = latest.max_match_id
+),
+
+ranked_players AS (
+    -- Rank players based on their latest ratings
+    SELECT
+        p.player_id AS PlayerID,
+        p.name AS Name,
+        RANK() OVER (ORDER BY lr.latest_rating DESC) AS Rank,
+        lr.latest_rating AS R,
+        lr.latest_rd AS Rd
+    FROM
+        players p
+    JOIN
+        player_match_counts pmc ON p.player_id = pmc.player_id
+    JOIN
+        latest_ratings lr ON p.player_id = lr.player_id
+)
+
+SELECT
+    rp.PlayerID,
+    rp.Name,
+    rp.Rank,
+    rp.R,
+    rp.Rd
+FROM
+    ranked_players rp
+ORDER BY
+    rp.Rank;
+
+
+
+-- name: LastWeekLeaderboard :many
+WITH recent_matches AS (
+    -- Filter matches from tournaments that ended at least one week ago
+    SELECT
+        ms.player_id,
+        ms.r,
+        ms.rd,
+        ms.match_id
+    FROM
+        match_slot ms
+    JOIN
+        matches m ON ms.match_id = m.match_id
+    JOIN
+        events e ON m.event_id = e.event_id
+    JOIN
+        tournaments t ON e.tournament_id = t.tournament_id
+    WHERE
+        t.end_at <= (CURRENT_DATE - INTERVAL '1 week')  -- Tournament ended at least one week ago
+),
+
+player_match_counts AS (
+    -- Count matches in the past year plus one week per player and filter to those with at least 30 matches
+    SELECT
+        ms.player_id,
+        COUNT(*) AS match_count
+    FROM
+        match_slot ms
+    JOIN
+        matches m ON ms.match_id = m.match_id
+    JOIN
+        events e ON m.event_id = e.event_id
+    JOIN
+        tournaments t ON e.tournament_id = t.tournament_id
+    WHERE
+        t.end_at <= (CURRENT_DATE - INTERVAL '1 week')  -- Ensure only tournaments that ended at least a week ago are considered
+        AND t.end_at >= (CURRENT_DATE - INTERVAL '53 weeks')  -- Include matches from the past year plus one week
+    GROUP BY
+        ms.player_id
+    HAVING
+        COUNT(*) >= 30  -- Filter to those with at least 30 matches
+),
+
+latest_ratings AS (
+    -- Get only the latest rating and RD for each player based on their most recent match_id
+    SELECT
+        rm.player_id,
+        rm.r AS latest_rating,
+        rm.rd AS latest_rd
+    FROM
+        recent_matches rm
+    JOIN
+        (SELECT player_id, MAX(match_id) AS max_match_id
+         FROM recent_matches
+         GROUP BY player_id) latest
+         ON rm.player_id = latest.player_id
+         AND rm.match_id = latest.max_match_id
+)
+
+SELECT
+    p.player_id AS PlayerID,
+    p.name AS Name,
+    RANK() OVER (ORDER BY lr.latest_rating DESC) AS Rank,
+    lr.latest_rating AS R,
+    lr.latest_rd AS Rd
+FROM
+    players p
+JOIN
+    player_match_counts pmc ON p.player_id = pmc.player_id
+JOIN
+    latest_ratings lr ON p.player_id = lr.player_id
+ORDER BY
+    Rank;
