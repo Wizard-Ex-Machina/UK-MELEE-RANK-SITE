@@ -9,7 +9,7 @@ type TitlebarProps = {
 export default function Titlebar(props: TitlebarProps) {
   return (
     <div className=" items-center justify-items-center">
-      <div className="text-left px-8 pt-48 bg-gradient-to-b from-teal-600 to-cyan-900">
+      <div className="text-left px-8 pt-24 bg-gradient-to-b from-teal-300/50 to-cyan-600/50">
         <h1 className={`text-8xl font-bold ${bebas_neue.className}`}>
           Wizard Ex Machina Presents…
         </h1>

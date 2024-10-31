@@ -16,13 +16,24 @@ export default async function Home() {
     return data;
   }
 
+  const randomMessages = [
+    "Now with daily updates!",
+    "Now in techincolor",
+    "I forgot how much I sucked",
+    "You, again? and I thought my ego was inflated",
+    "Is Frenzy back at #1 yet? I feel like he should be by now",
+    "Your rating is not gonna go up if you keep looking at this page, go win some games, dummy",
+  ];
+  const randomMessage =
+    randomMessages[Math.floor(Math.random() * randomMessages.length)];
+
   const leaderboard = await getLeaderboard();
 
   return (
     <div>
       <Titlebar
         title="A Glicko2 Ranking Of People That Sometimes Play Melee In The UK"
-        subtitle="Now with daily updates!"
+        subtitle={randomMessage}
       />
       <div className="w-full flex justify-center">
         <div className="w-1/2">
