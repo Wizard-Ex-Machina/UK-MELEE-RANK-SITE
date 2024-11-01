@@ -26,7 +26,6 @@ type leaderboardItem struct {
 }
 
 func GetLeaderboard(c *gin.Context) {
-	println("test")
 	ctx := context.Background()
 	db, err := pgx.Connect(ctx, config.DATABASE_URL())
 	if err != nil {

@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import { Player } from "../page";
 
 type props = {
@@ -64,11 +66,12 @@ export default function LeaderboardItem(props: props) {
   const color = getColor(player.Percentile);
   const { rankDiffColor, rankDiffText } = getRankDiffColor(player.RankDiff);
   const { ratingDiffColor, ratingDiffText } = getRatingDiffColor(player.Delta);
-
+  const [isActive, setIsActive] = useState(false);
   return (
     <div
-      className={`my-4  w-full  border-2 rounded-md font-bold  ${color}`}
+      className={`my-4  w-full  border-2 rounded-md font-bold  ${color} hover:cursor-pointer `}
       key={PlayerID}
+      onClick={() => setIsActive(!isActive)}
     >
       <div className="h-12 flex items-center px-4">
         <div className="w-16 items-center">
@@ -90,6 +93,7 @@ export default function LeaderboardItem(props: props) {
           <p className="text-center">{Math.round(R)}</p>
         </div>
       </div>
+      {isActive ? <div className="h-36 flex items-center px-4"> </div> : null}
     </div>
   );
 }

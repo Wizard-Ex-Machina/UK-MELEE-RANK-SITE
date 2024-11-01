@@ -14,6 +14,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/leaderboard", api.GetLeaderboard)
+	router.GET("/ratingHistory/:id", api.GetRatingHistory)
 
 	router.Run("localhost:8080")
 

@@ -236,3 +236,43 @@ JOIN
     latest_ratings lr ON p.player_id = lr.player_id
 ORDER BY
     Rank;
+
+
+-- name: GetRatingHistory :many
+WITH latest_event_matches AS (
+    -- For the specified player, find the latest match_id in each event they attended
+    SELECT
+        ms.player_id,
+        m.event_id,
+        MAX(ms.match_id) AS latest_match_id
+    FROM
+        match_slot ms
+    JOIN
+        matches m ON ms.match_id = m.match_id
+    WHERE
+        ms.player_id = $1 -- Player ID parameter
+    GROUP BY
+        ms.player_id, m.event_id
+)
+
+SELECT
+    p.player_id AS PlayerID,
+    p.name AS Name,
+    e.event_id AS EventID,
+    e.name AS EventName,
+    t.name AS TournamentName,
+    t.end_at AS TournamentDate,
+    ms.r AS Rating,
+    ms.rd AS RatingDeviation
+FROM
+    latest_event_matches lem
+JOIN
+    match_slot ms ON lem.latest_match_id = ms.match_id AND ms.player_id = lem.player_id  -- Ensure only the specified player’s match slot
+JOIN
+    players p ON lem.player_id = p.player_id
+JOIN
+    events e ON lem.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+ORDER BY
+    e.event_id;

@@ -436,6 +436,86 @@ func (q *Queries) GetRating(ctx context.Context, playerID int32) (MatchSlot, err
 	return i, err
 }
 
+const getRatingHistory = `-- name: GetRatingHistory :many
+WITH latest_event_matches AS (
+    -- For the specified player, find the latest match_id in each event they attended
+    SELECT
+        ms.player_id,
+        m.event_id,
+        MAX(ms.match_id) AS latest_match_id
+    FROM
+        match_slot ms
+    JOIN
+        matches m ON ms.match_id = m.match_id
+    WHERE
+        ms.player_id = $1 -- Player ID parameter
+    GROUP BY
+        ms.player_id, m.event_id
+)
+
+SELECT
+    p.player_id AS PlayerID,
+    p.name AS Name,
+    e.event_id AS EventID,
+    e.name AS EventName,
+    t.name AS TournamentName,
+    t.end_at AS TournamentDate,
+    ms.r AS Rating,
+    ms.rd AS RatingDeviation
+FROM
+    latest_event_matches lem
+JOIN
+    match_slot ms ON lem.latest_match_id = ms.match_id AND ms.player_id = lem.player_id  -- Ensure only the specified player’s match slot
+JOIN
+    players p ON lem.player_id = p.player_id
+JOIN
+    events e ON lem.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+ORDER BY
+    e.event_id
+`
+
+type GetRatingHistoryRow struct {
+	Playerid        int32
+	Name            string
+	Eventid         int32
+	Eventname       string
+	Tournamentname  string
+	Tournamentdate  pgtype.Date
+	Rating          pgtype.Numeric
+	Ratingdeviation pgtype.Numeric
+}
+
+func (q *Queries) GetRatingHistory(ctx context.Context, playerID int32) ([]GetRatingHistoryRow, error) {
+	rows, err := q.db.Query(ctx, getRatingHistory, playerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRatingHistoryRow
+	for rows.Next() {
+		var i GetRatingHistoryRow
+		if err := rows.Scan(
+			&i.Playerid,
+			&i.Name,
+			&i.Eventid,
+			&i.Eventname,
+			&i.Tournamentname,
+			&i.Tournamentdate,
+			&i.Rating,
+			&i.Ratingdeviation,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const lastWeekLeaderboard = `-- name: LastWeekLeaderboard :many
 WITH recent_matches AS (
     -- Filter matches from tournaments that ended at least one week ago
