@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Player } from "../page";
+import PlayerProfile from "./PlayerProfile";
 
 type props = {
   player: Player;
@@ -73,7 +74,7 @@ export default function LeaderboardItem(props: props) {
       key={PlayerID}
       onClick={() => setIsActive(!isActive)}
     >
-      <div className="h-12 flex items-center px-4">
+      <div className="min-h-12 flex items-center px-4">
         <div className="w-16 items-center">
           <p className="text-center">#{Rank}</p>
         </div>
@@ -93,7 +94,11 @@ export default function LeaderboardItem(props: props) {
           <p className="text-center">{Math.round(R)}</p>
         </div>
       </div>
-      {isActive ? <div className="h-36 flex items-center px-4"> </div> : null}
+      {isActive ? (
+        <Suspense className="flex items-center px-4 text-white">
+          <PlayerProfile player={player} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

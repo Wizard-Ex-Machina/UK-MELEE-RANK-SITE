@@ -21,8 +21,7 @@ export default async function Home() {
     "Now in techincolor",
     "I forgot how much I sucked",
     "You, again? and I thought my ego was inflated",
-    "Is Frenzy back at #1 yet? I feel like he should be by now",
-    "Your rating is not gonna go up if you keep looking at this page, go win some games, dummy",
+    "Your rating is not gonna go up if you keep looking at this page, go win some games",
   ];
   const randomMessage =
     randomMessages[Math.floor(Math.random() * randomMessages.length)];
