@@ -319,6 +319,79 @@ func (q *Queries) CurrentLeaderboard(ctx context.Context) ([]CurrentLeaderboardR
 	return items, nil
 }
 
+const getMatchHistory = `-- name: GetMatchHistory :many
+SELECT
+    ms1.match_id AS MatchID,
+    ms1.player_id AS PlayerID,
+    p1.name AS PlayerName,
+    ms2.player_id AS OpponentID,
+    p2.name AS OpponentName,
+    ms1.score AS PlayerScore,
+    ms1.delta AS RatingChange,
+    ms2.score AS OpponentScore,
+    ms1.win AS PlayerWin
+FROM
+    match_slot ms1
+JOIN
+    match_slot ms2 ON ms1.match_id = ms2.match_id AND ms1.player_id != ms2.player_id
+JOIN
+    matches m ON ms1.match_id = m.match_id
+JOIN
+    events e ON m.event_id = e.event_id
+JOIN
+    players p1 ON ms1.player_id = p1.player_id
+JOIN
+    players p2 ON ms2.player_id = p2.player_id
+WHERE
+    ms1.player_id = $1  -- Replace 123 with the player ID you're interested in
+ORDER BY
+    ms1.match_id DESC  -- Order by the most recent matches
+LIMIT 250
+`
+
+type GetMatchHistoryRow struct {
+	Matchid       int32
+	Playerid      int32
+	Playername    string
+	Opponentid    int32
+	Opponentname  string
+	Playerscore   int32
+	Ratingchange  pgtype.Numeric
+	Opponentscore int32
+	Playerwin     bool
+}
+
+// Get the match history for the specified player
+func (q *Queries) GetMatchHistory(ctx context.Context, playerID int32) ([]GetMatchHistoryRow, error) {
+	rows, err := q.db.Query(ctx, getMatchHistory, playerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMatchHistoryRow
+	for rows.Next() {
+		var i GetMatchHistoryRow
+		if err := rows.Scan(
+			&i.Matchid,
+			&i.Playerid,
+			&i.Playername,
+			&i.Opponentid,
+			&i.Opponentname,
+			&i.Playerscore,
+			&i.Ratingchange,
+			&i.Opponentscore,
+			&i.Playerwin,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMostRecentTournament = `-- name: GetMostRecentTournament :one
 SELECT
     tournament_id,
@@ -345,6 +418,81 @@ func (q *Queries) GetMostRecentTournament(ctx context.Context) (Tournament, erro
 		&i.Slug,
 	)
 	return i, err
+}
+
+const getOpponentRecords = `-- name: GetOpponentRecords :many
+WITH opponent_latest_ratings AS (
+    -- Get the latest match rating for each opponent
+    SELECT
+        ms.player_id AS OpponentID,
+        ms.r AS OpponentRating
+    FROM
+        match_slot ms
+    JOIN
+        (SELECT player_id, MAX(match_id) AS latest_match_id
+         FROM match_slot
+         GROUP BY player_id) latest_match
+         ON ms.player_id = latest_match.player_id
+         AND ms.match_id = latest_match.latest_match_id
+)
+
+SELECT
+    ms2.player_id AS OpponentID,
+    p2.name AS OpponentName,
+    SUM(CASE WHEN ms1.win = TRUE THEN 1 ELSE 0 END) AS Wins,
+    SUM(CASE WHEN ms1.win = FALSE THEN 1 ELSE 0 END) AS Losses,
+    olr.OpponentRating AS OpponentMostRecentRating
+FROM
+    match_slot ms1
+JOIN
+    match_slot ms2 ON ms1.match_id = ms2.match_id AND ms1.player_id != ms2.player_id
+JOIN
+    players p1 ON ms1.player_id = p1.player_id
+JOIN
+    players p2 ON ms2.player_id = p2.player_id
+JOIN
+    opponent_latest_ratings olr ON ms2.player_id = olr.OpponentID
+WHERE
+    ms1.player_id = $1  -- Replace 123 with the desired player_id
+GROUP BY
+    ms1.player_id, p1.name, ms2.player_id, p2.name, olr.OpponentRating
+ORDER BY
+    olr.OpponentRating DESC
+`
+
+type GetOpponentRecordsRow struct {
+	Opponentid               int32
+	Opponentname             string
+	Wins                     int64
+	Losses                   int64
+	Opponentmostrecentrating pgtype.Numeric
+}
+
+// Get the win-loss-draw record against each opponent for the specified player
+func (q *Queries) GetOpponentRecords(ctx context.Context, playerID int32) ([]GetOpponentRecordsRow, error) {
+	rows, err := q.db.Query(ctx, getOpponentRecords, playerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOpponentRecordsRow
+	for rows.Next() {
+		var i GetOpponentRecordsRow
+		if err := rows.Scan(
+			&i.Opponentid,
+			&i.Opponentname,
+			&i.Wins,
+			&i.Losses,
+			&i.Opponentmostrecentrating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getPlayerAliase = `-- name: GetPlayerAliase :one
@@ -406,17 +554,12 @@ SELECT
     ms.delta
 FROM
     match_slot ms
-JOIN
-    matches m ON ms.match_id = m.match_id
-JOIN
-    events e ON m.event_id = e.event_id
-JOIN
-    tournaments t ON e.tournament_id = t.tournament_id
 WHERE
     ms.player_id = $1
 ORDER BY
-    t.end_at DESC
+    ms.match_id DESC
 LIMIT 1
+FOR UPDATE
 `
 
 // This query will fail if the player_id does not exist

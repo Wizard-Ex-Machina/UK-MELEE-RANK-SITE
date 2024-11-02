@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { Player } from "@/app/page";
 import { ResponsiveLine, Line } from "@nivo/line";
 import { format } from "path";
@@ -7,9 +8,9 @@ type RatingHistoryChartProps = {
   player: Player;
 };
 function getColor(percentile: number) {
-  let color = "#6366f1";
+  let color = "#ef4444";
   if (percentile > 5) {
-    color = "#ef4444";
+    color = "#6366f1";
   }
   if (percentile > 12.5) {
     color = "#10b981";
@@ -25,20 +26,27 @@ function getColor(percentile: number) {
   }
   return color;
 }
-export default async function RatingHistoryChart(
-  props: RatingHistoryChartProps,
-) {
+export default function RatingHistoryChart(props: RatingHistoryChartProps) {
   type RatingHistory = {
     TournamentName: string;
     Rating: number;
     Date: string;
   };
-  async function getRatingHistory(id: number): Promise<RatingHistory[]> {
-    const res = await fetch(`http://localhost:8080/ratingHistory/${id}`);
-    const data = await res.json();
-    return data;
-  }
-  const history = await getRatingHistory(props.player.PlayerID);
+
+  const [history, setHistory] = useState<RatingHistory[]>([]),
+    [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function getRatingHistory(id: number): Promise<RatingHistory[]> {
+      const res = await fetch(`http://localhost:8080/ratingHistory/${id}`);
+      const data = await res.json();
+      return data;
+    }
+    getRatingHistory(props.player.PlayerID).then((data) => {
+      setHistory(data);
+      setLoading(true);
+    });
+  }, [props.player.PlayerID]);
   const data = [
     {
       id: "Rating",
@@ -49,7 +57,7 @@ export default async function RatingHistoryChart(
     },
   ];
   const color = getColor(props.player.Percentile);
-  return (
+  return loading ? (
     <ResponsiveLine
       colors={[color]}
       data={data}
@@ -62,7 +70,7 @@ export default async function RatingHistoryChart(
       yScale={{
         type: "linear",
         min: "0",
-        max: "3000",
+        max: "3250",
       }}
       gridYValues={[0, 500, 1000, 1500, 2000, 2500, 3000]}
       xScale={{
@@ -94,5 +102,5 @@ export default async function RatingHistoryChart(
         truncateTickAt: 0,
       }}
     />
-  );
+  ) : null;
 }

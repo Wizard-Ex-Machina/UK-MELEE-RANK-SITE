@@ -35,7 +35,7 @@ export default async function Home() {
         subtitle={randomMessage}
       />
       <div className="w-full flex justify-center">
-        <div className="w-1/2">
+        <div className="w-1/2" key="tcyfvugbhinji">
           <div
             className={`my-4 h-12 w-full flex  border-2 rounded-md font-bold px-4 items-center bg-gradient-to-r from-zinc-100/25 to-zinc-300/25 border-zinc-50`}
           >

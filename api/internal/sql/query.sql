@@ -24,17 +24,12 @@ SELECT
     ms.delta
 FROM
     match_slot ms
-JOIN
-    matches m ON ms.match_id = m.match_id
-JOIN
-    events e ON m.event_id = e.event_id
-JOIN
-    tournaments t ON e.tournament_id = t.tournament_id
 WHERE
     ms.player_id = $1
 ORDER BY
-    t.end_at DESC
-LIMIT 1;
+    ms.match_id DESC
+LIMIT 1
+FOR UPDATE;
 
 -- name: CreatePlayerAlias :one
 -- This query will fail if the player_id does not exist
@@ -276,3 +271,75 @@ JOIN
     tournaments t ON e.tournament_id = t.tournament_id
 ORDER BY
     e.event_id;
+
+
+-- name: GetOpponentRecords :many
+-- Get the win-loss-draw record against each opponent for the specified player
+WITH opponent_latest_ratings AS (
+    -- Get the latest match rating for each opponent
+    SELECT
+        ms.player_id AS OpponentID,
+        ms.r AS OpponentRating
+    FROM
+        match_slot ms
+    JOIN
+        (SELECT player_id, MAX(match_id) AS latest_match_id
+         FROM match_slot
+         GROUP BY player_id) latest_match
+         ON ms.player_id = latest_match.player_id
+         AND ms.match_id = latest_match.latest_match_id
+)
+
+SELECT
+    ms2.player_id AS OpponentID,
+    p2.name AS OpponentName,
+    SUM(CASE WHEN ms1.win = TRUE THEN 1 ELSE 0 END) AS Wins,
+    SUM(CASE WHEN ms1.win = FALSE THEN 1 ELSE 0 END) AS Losses,
+    olr.OpponentRating AS OpponentMostRecentRating
+FROM
+    match_slot ms1
+JOIN
+    match_slot ms2 ON ms1.match_id = ms2.match_id AND ms1.player_id != ms2.player_id
+JOIN
+    players p1 ON ms1.player_id = p1.player_id
+JOIN
+    players p2 ON ms2.player_id = p2.player_id
+JOIN
+    opponent_latest_ratings olr ON ms2.player_id = olr.OpponentID
+WHERE
+    ms1.player_id = $1  -- Replace 123 with the desired player_id
+GROUP BY
+    ms1.player_id, p1.name, ms2.player_id, p2.name, olr.OpponentRating
+ORDER BY
+    olr.OpponentRating DESC;
+
+
+-- name: GetMatchHistory :many
+-- Get the match history for the specified player
+SELECT
+    ms1.match_id AS MatchID,
+    ms1.player_id AS PlayerID,
+    p1.name AS PlayerName,
+    ms2.player_id AS OpponentID,
+    p2.name AS OpponentName,
+    ms1.score AS PlayerScore,
+    ms1.delta AS RatingChange,
+    ms2.score AS OpponentScore,
+    ms1.win AS PlayerWin
+FROM
+    match_slot ms1
+JOIN
+    match_slot ms2 ON ms1.match_id = ms2.match_id AND ms1.player_id != ms2.player_id
+JOIN
+    matches m ON ms1.match_id = m.match_id
+JOIN
+    events e ON m.event_id = e.event_id
+JOIN
+    players p1 ON ms1.player_id = p1.player_id
+JOIN
+    players p2 ON ms2.player_id = p2.player_id
+WHERE
+    ms1.player_id = $1  -- Replace 123 with the player ID you're interested in
+ORDER BY
+    ms1.match_id DESC  -- Order by the most recent matches
+LIMIT 250;

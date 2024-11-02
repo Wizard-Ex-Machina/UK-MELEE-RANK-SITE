@@ -97,7 +97,12 @@ func Scraper() {
 }
 
 func MatchConditions(match startgg.Match) bool {
-	return (len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants)) == 2 && match.Slots[1].Standing.Stats.Score.Value != -1 && match.Slots[0].Standing.Stats.Score.Value != -1
+	if (len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants)) == 2 && match.Slots[1].Standing.Stats.Score.Value != -1 && match.Slots[0].Standing.Stats.Score.Value != -1 {
+		if match.Slots[0].Entrant.Participants[0].User.Id != match.Slots[1].Entrant.Participants[0].User.Id {
+			return true
+		}
+	}
+	return false
 }
 
 func SaveMatchSlot(ctx context.Context, queries *postgres.Queries, score int, win bool, player postgres.Player, rating *glicko.Player, match postgres.Match, oldRating float64) (postgres.MatchSlot, error) {

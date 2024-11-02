@@ -8,10 +8,10 @@ type props = {
 };
 
 function getColor(percentile: number) {
-  let color =
-    "bg-gradient-to-r from-indigo-600/25 to-indigo-800/25 border-indigo-500 ";
+  let color = "bg-gradient-to-r from-red-600/25 to-red-800/25 border-red-500";
   if (percentile > 5) {
-    color = "bg-gradient-to-r from-red-600/25 to-red-800/25 border-red-500";
+    color =
+      "bg-gradient-to-r from-indigo-600/25 to-indigo-800/25 border-indigo-500 ";
   }
   if (percentile > 12.5) {
     color =
@@ -70,7 +70,10 @@ export default function LeaderboardItem(props: props) {
   const [isActive, setIsActive] = useState(false);
   return (
     <div
-      className={`my-4  w-full  border-2 rounded-md font-bold  ${color} hover:cursor-pointer `}
+      className={
+        `my-4  w-full border-2 rounded-md font-bold  ${color} ` +
+        (isActive ? "hover:cursor-auto" : "hover:cursor-pointer")
+      }
       key={PlayerID}
       onClick={() => setIsActive(!isActive)}
     >
@@ -96,6 +99,7 @@ export default function LeaderboardItem(props: props) {
       </div>
       {isActive ? (
         <Suspense className="flex items-center px-4 text-white">
+          <div className={`w-full  mb-2 border-b-2 ${color}`} />
           <PlayerProfile player={player} />
         </Suspense>
       ) : null}
