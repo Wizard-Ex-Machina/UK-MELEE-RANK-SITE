@@ -86,6 +86,16 @@ func Scraper() {
 									}
 								}
 							}
+							// get placements from event
+
+							placements := startgg.GetPlacements(event.Id)
+							for _, placement := range placements {
+								player, _ := queries.GetPlayerFromAlias(ctx, int32(placement.Entrant.Particpants[0].User.Id))
+								_, err := queries.CreatePlacement(ctx, postgres.CreatePlacementParams{PlayerID: player.PlayerID, EventID: dbEvent.EventID, Placement: int32(placement.Placement)})
+								if err != nil {
+									log.Println(err)
+								}
+							}
 						}
 					}
 				}
@@ -135,12 +145,23 @@ func GetOrCreatePlayer(ctx context.Context, queries *postgres.Queries, match sta
 	}
 	//Get Players most recent match
 	mostRecentMatch, _ := queries.GetRating(ctx, player.PlayerID)
-
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			playerRating := glicko.NewPlayer(glicko.NewRating(float64(2500), float64(300), float64(0.05)))
+			return player, playerRating
+		} else {
+			fmt.Println(err)
+		}
+	}
 	r, _ := mostRecentMatch.R.Float64Value()
 	rd, _ := mostRecentMatch.Rd.Float64Value()
 	sigma, _ := mostRecentMatch.Sigma.Float64Value()
-	glickoPlayer := glicko.NewPlayer(glicko.NewRating(r.Float64, rd.Float64, sigma.Float64))
+	if r.Float64 == 0 || rd.Float64 == 0 || sigma.Float64 == 0 {
+		glickoPlayer := glicko.NewPlayer(glicko.NewRating(float64(2500), float64(300), float64(0.05)))
+		return player, glickoPlayer
+	} else {
+		glickoPlayer := glicko.NewPlayer(glicko.NewRating(r.Float64, rd.Float64, sigma.Float64))
+		return player, glickoPlayer
+	}
 	// glickoPlayer := glicko.NewPlayer(glicko.NewDefaultRating())
-
-	return player, glickoPlayer
 }

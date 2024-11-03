@@ -51,7 +51,9 @@ func GetMatches(eventID int) []Match {
 		matches = append(matches, temp.Data.Event.Sets.Nodes...)
 		pageLength = len(temp.Data.Event.Sets.Nodes)
 		page += 1
+
 		time.Sleep(time.Second / 3)
+
 	}
 	return matches
 }
