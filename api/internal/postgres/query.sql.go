@@ -111,6 +111,10 @@ func (q *Queries) CreatePlacement(ctx context.Context, arg CreatePlacementParams
 }
 
 const createPlayer = `-- name: CreatePlayer :one
+
+
+
+
 INSERT INTO players (name, first_appearance) VALUES ($1, $2) RETURNING player_id, name, first_appearance
 `
 
@@ -119,6 +123,7 @@ type CreatePlayerParams struct {
 	FirstAppearance pgtype.Date
 }
 
+// Orders by the most recent tournaments
 func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
 	row := q.db.QueryRow(ctx, createPlayer, arg.Name, arg.FirstAppearance)
 	var i Player
@@ -648,6 +653,76 @@ func (q *Queries) GetRatingHistory(ctx context.Context, playerID int32) ([]GetRa
 			&i.Tournamentdate,
 			&i.Rating,
 			&i.Ratingdeviation,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRecentPlacements = `-- name: GetRecentPlacements :many
+SELECT
+    p.player_id AS PlayerID,
+    p.name AS PlayerName,
+    t.name AS TournamentName,
+    t.end_at AS TournamentDate,
+    t.tournament_id as TournamentID,
+    pl.placement AS Placement,
+    event_counts.total_players AS TotalPlayers
+FROM
+    placements pl
+JOIN
+    events e ON pl.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+JOIN
+    players p ON pl.player_id = p.player_id
+JOIN
+    (SELECT
+         event_id,
+         COUNT(DISTINCT player_id) AS total_players
+     FROM
+         placements
+     GROUP BY
+         event_id) event_counts ON pl.event_id = event_counts.event_id
+WHERE
+    pl.player_id = $1  -- Replace 123 with the desired player ID
+ORDER BY
+    t.end_at DESC
+`
+
+type GetRecentPlacementsRow struct {
+	Playerid       int32
+	Playername     string
+	Tournamentname string
+	Tournamentdate pgtype.Date
+	Tournamentid   int32
+	Placement      int32
+	Totalplayers   int64
+}
+
+// Get the recent placements for the specified player
+func (q *Queries) GetRecentPlacements(ctx context.Context, playerID int32) ([]GetRecentPlacementsRow, error) {
+	rows, err := q.db.Query(ctx, getRecentPlacements, playerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRecentPlacementsRow
+	for rows.Next() {
+		var i GetRecentPlacementsRow
+		if err := rows.Scan(
+			&i.Playerid,
+			&i.Playername,
+			&i.Tournamentname,
+			&i.Tournamentdate,
+			&i.Tournamentid,
+			&i.Placement,
+			&i.Totalplayers,
 		); err != nil {
 			return nil, err
 		}

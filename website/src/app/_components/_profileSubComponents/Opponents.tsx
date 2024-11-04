@@ -14,7 +14,7 @@ type Opponent = {
   OpponentId: number;
   OpponentName: string;
   Wins: number;
-  Loses: number;
+  Losses: number;
   Rating: number;
 };
 export default function Opponents(props: PlayerProfileProps) {
@@ -28,7 +28,7 @@ export default function Opponents(props: PlayerProfileProps) {
         setOpponents(data);
         setLoading(false);
       });
-  }, [props.player.PlayerId]);
+  }, [props.player.PlayerID]);
   return (
     <div className="flex flex-col ">
       <div className="text-lg font-bold">Player Matchups</div>

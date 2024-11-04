@@ -30,7 +30,7 @@ export default function RecentMatches(props: PlayerProfileProps) {
         setMatches(data);
         setLoading(false);
       });
-  }, [props.player.PlayerId]);
+  }, [props.player.PlayerID]);
   return (
     <div className="flex flex-col ">
       <div className="text-lg font-bold">Recent Matches</div>

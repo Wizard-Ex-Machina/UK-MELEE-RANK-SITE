@@ -1,6 +1,40 @@
 -- name: GetPlayers :many
 SELECT * FROM players;
 
+-- name: GetRecentPlacements :many
+-- Get the recent placements for the specified player
+SELECT
+    p.player_id AS PlayerID,
+    p.name AS PlayerName,
+    t.name AS TournamentName,
+    t.end_at AS TournamentDate,
+    t.tournament_id as TournamentID,
+    pl.placement AS Placement,
+    event_counts.total_players AS TotalPlayers
+FROM
+    placements pl
+JOIN
+    events e ON pl.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+JOIN
+    players p ON pl.player_id = p.player_id
+JOIN
+    (SELECT
+         event_id,
+         COUNT(DISTINCT player_id) AS total_players
+     FROM
+         placements
+     GROUP BY
+         event_id) event_counts ON pl.event_id = event_counts.event_id
+WHERE
+    pl.player_id = $1  -- Replace 123 with the desired player ID
+ORDER BY
+    t.end_at DESC;  -- Orders by the most recent tournaments
+
+
+
+
 -- name: CreatePlayer :one
 INSERT INTO players (name, first_appearance) VALUES ($1, $2) RETURNING *;
 
