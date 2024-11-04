@@ -1,6 +1,24 @@
 -- name: GetPlayers :many
 SELECT * FROM players;
 
+-- name: GetMatchesPerQuartrer :many
+SELECT
+    EXTRACT(YEAR FROM t.end_at) AS year,         -- Extracting the year from tournament end date
+    EXTRACT(QUARTER FROM t.end_at) AS quarter,   -- Extracting the quarter from tournament end date
+    COUNT(m.match_id) AS number_of_matches         -- Counting the number of matches
+FROM
+    matches m
+JOIN
+    events e ON m.event_id = e.event_id
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+GROUP BY
+    year, quarter                                -- Grouping by year and quarter
+ORDER BY
+    year, quarter;                               -- Ordering by year and quarter
+
+
+
 -- name: GetRecentPlacements :many
 -- Get the recent placements for the specified player
 SELECT
@@ -377,3 +395,150 @@ WHERE
 ORDER BY
     ms1.match_id DESC  -- Order by the most recent matches
 LIMIT 250;
+
+-- name: GetWinRateByRatingDifference :many
+WITH player_match_stats AS (
+    -- Calculate the rating difference for each match slot where player_id differs (opponent)
+    -- Only include matches where the player's rating is 2500 or above
+    SELECT
+        ms1.player_id AS PlayerID,
+        ms1.match_id AS MatchID,
+        ms1.win AS PlayerWin,
+        ((ms1.r - ms1.delta) - (ms2.r - ms2.delta)) AS RatingDifference
+    FROM
+        match_slot ms1
+    JOIN
+        match_slot ms2 ON ms1.match_id = ms2.match_id
+        AND ms1.player_id != ms2.player_id
+    WHERE
+        ms1.r >= $1  -- Filter to only include matches where the player’s rating is 2500 or above
+        AND ms1.rd < 100
+        AND ms2.rd < 100
+),
+
+rating_ranges AS (
+    -- Assign each rating difference into 50-point bins and use the midpoint as the label
+    SELECT
+        PlayerID,
+        CASE
+            WHEN RatingDifference BETWEEN 550 AND 599 THEN '575'
+            WHEN RatingDifference BETWEEN 500 AND 549 THEN '525'
+            WHEN RatingDifference BETWEEN 450 AND 499 THEN '475'
+            WHEN RatingDifference BETWEEN 400 AND 449 THEN '425'
+            WHEN RatingDifference BETWEEN 350 AND 399 THEN '375'
+            WHEN RatingDifference BETWEEN 300 AND 349 THEN '325'
+            WHEN RatingDifference BETWEEN 250 AND 299 THEN '275'
+            WHEN RatingDifference BETWEEN 200 AND 249 THEN '225'
+            WHEN RatingDifference BETWEEN 150 AND 199 THEN '175'
+            WHEN RatingDifference BETWEEN 100 AND 149 THEN '125'
+            WHEN RatingDifference BETWEEN 50 AND 99 THEN '75'
+            WHEN RatingDifference BETWEEN 0 AND 49 THEN '25'
+            WHEN RatingDifference BETWEEN -50 AND -1 THEN '-25'
+            WHEN RatingDifference BETWEEN -100 AND -51 THEN '-75'
+            WHEN RatingDifference BETWEEN -150 AND -101 THEN '-125'
+            WHEN RatingDifference BETWEEN -200 AND -151 THEN '-175'
+            WHEN RatingDifference BETWEEN -250 AND -201 THEN '-225'
+            WHEN RatingDifference BETWEEN -300 AND -251 THEN '-275'
+            WHEN RatingDifference BETWEEN -350 AND -301 THEN '-325'
+            WHEN RatingDifference BETWEEN -400 AND -351 THEN '-375'
+            WHEN RatingDifference BETWEEN -450 AND -401 THEN '-425'
+            WHEN RatingDifference BETWEEN -500 AND -451 THEN '-475'
+            WHEN RatingDifference BETWEEN -550 AND -501 THEN '-525'
+            WHEN RatingDifference BETWEEN -600 AND -551 THEN '-575'
+
+            ELSE 'Other'
+        END AS RatingRange,
+        PlayerWin
+    FROM
+        player_match_stats
+)
+
+SELECT
+    RatingRange,
+    ROUND((SUM(CASE WHEN PlayerWin = TRUE THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) AS Winrate
+FROM
+    rating_ranges
+WHERE
+    RatingRange != 'Other'
+GROUP BY
+    RatingRange
+ORDER BY
+    CAST(RatingRange AS INTEGER) DESC;
+
+-- name: GetRatingDistribution :many
+WITH latest_ratings AS (
+    -- Get the most recent rating and rd for each player based on the maximum match_id
+    SELECT
+        ms.player_id,
+        ms.r AS rating,
+        ms.rd
+    FROM
+        match_slot ms
+    JOIN
+        (SELECT player_id, MAX(match_id) AS max_match_id
+         FROM match_slot
+         GROUP BY player_id) latest_match
+    ON ms.player_id = latest_match.player_id
+    AND ms.match_id = latest_match.max_match_id
+    WHERE
+        ms.rd < 70 -- Filter for players with rd less than 100
+),
+
+binned_ratings AS (
+    -- Bin players' most recent ratings for the histogram using bin midpoints
+    SELECT
+        CASE
+        	WHEN rating >= 3250 THEN 3275
+            WHEN rating >= 3200 THEN 3225
+        	WHEN rating >= 3150 THEN 3175
+            WHEN rating >= 3100 THEN 3125
+        	WHEN rating >= 3050 THEN 3075
+            WHEN rating >= 3000 THEN 3025
+            WHEN rating >= 2950 THEN 2975
+            WHEN rating >= 2900 THEN 2925
+            WHEN rating >= 2850 THEN 2875
+            WHEN rating >= 2800 THEN 2825
+            WHEN rating >= 2750 THEN 2775
+            WHEN rating >= 2700 THEN 2725
+            WHEN rating >= 2650 THEN 2675
+            WHEN rating >= 2600 THEN 2625
+            WHEN rating >= 2550 THEN 2575
+            WHEN rating >= 2500 THEN 2525
+            WHEN rating >= 2450 THEN 2475
+            WHEN rating >= 2400 THEN 2425
+            WHEN rating >= 2350 THEN 2375
+            WHEN rating >= 2300 THEN 2325
+            WHEN rating >= 2250 THEN 2275
+            WHEN rating >= 2200 THEN 2225
+            WHEN rating >= 2150 THEN 2175
+            WHEN rating >= 2100 THEN 2125
+            WHEN rating >= 2050 THEN 2075
+            WHEN rating >= 2000 THEN 2025
+            WHEN rating >= 1950 THEN 1975
+            WHEN rating >= 1900 THEN 1925
+            WHEN rating >= 1850 THEN 1875
+            WHEN rating >= 1800 THEN 1825
+            WHEN rating >= 1750 THEN 1775
+            WHEN rating >= 1700 THEN 1725
+            WHEN rating >= 1650 THEN 1675
+            WHEN rating >= 1600 THEN 1625
+            WHEN rating >= 1550 THEN 1575
+            WHEN rating >= 1500 THEN 1525
+
+            ELSE 50
+        END AS RatingMidpoint,
+        COUNT(*) AS PlayerCount
+    FROM
+        latest_ratings
+    GROUP BY
+        RatingMidpoint
+)
+
+-- Order by the rating midpoints for easier histogram plotting
+SELECT
+    RatingMidpoint,
+    PlayerCount
+FROM
+    binned_ratings
+ORDER BY
+    RatingMidpoint DESC;
