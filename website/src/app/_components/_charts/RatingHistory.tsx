@@ -15,13 +15,16 @@ function getColor(percentile: number) {
   if (percentile > 12.5) {
     color = "#10b981";
   }
-  if (percentile > 25) {
+  if (percentile > 30) {
+    color = "#06b6d4";
+  }
+  if (percentile > 47.5) {
     color = "#eab308";
   }
-  if (percentile > 50) {
+  if (percentile > 65) {
     color = "#64748b";
   }
-  if (percentile > 75) {
+  if (percentile > 82.5) {
     color = "#ea580c";
   }
   return color;
@@ -53,6 +56,7 @@ export default function RatingHistoryChart(props: RatingHistoryChartProps) {
       data: history.map((h) => ({
         x: h.Date.split(" ")[0],
         y: h.Rating,
+        name: h.TournamentName,
       })),
     },
   ];
@@ -89,7 +93,7 @@ export default function RatingHistoryChart(props: RatingHistoryChartProps) {
         truncateTickAt: 0,
       }}
       enableArea={true}
-      enablePoints={false}
+      pointSize={5}
       margin={{ top: 10, right: 50, bottom: 60, left: 60 }}
       axisBottom={{
         tickSize: 5,
@@ -101,6 +105,13 @@ export default function RatingHistoryChart(props: RatingHistoryChartProps) {
         legendPosition: "middle",
         truncateTickAt: 0,
       }}
+      isInteractive={true}
+      useMesh={true}
+      tooltip={({ point }) => (
+        <div className="bg-slate-500/25 rounded-md p-2 text-white">
+          <div>{point.data.name}</div>
+        </div>
+      )}
     />
   ) : null;
 }

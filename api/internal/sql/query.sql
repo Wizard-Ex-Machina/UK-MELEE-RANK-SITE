@@ -1,6 +1,23 @@
 -- name: GetPlayers :many
 SELECT * FROM players;
 
+-- name: GetEventAttendies :many
+SELECT
+	t.tournament_id as ID,
+    t.end_at AS event_date,
+    t.name AS event_name,
+    COUNT(p.player_id) AS number_of_placements
+FROM
+    events e
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+JOIN
+    placements p ON e.event_id = p.event_id
+GROUP BY
+    t.end_at, t.name, t.tournament_id
+ORDER BY
+    t.end_at DESC;
+
 -- name: GetMatchesPerQuartrer :many
 SELECT
     EXTRACT(YEAR FROM t.end_at) AS year,         -- Extracting the year from tournament end date

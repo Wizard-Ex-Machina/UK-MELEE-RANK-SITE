@@ -324,6 +324,56 @@ func (q *Queries) CurrentLeaderboard(ctx context.Context) ([]CurrentLeaderboardR
 	return items, nil
 }
 
+const getEventAttendies = `-- name: GetEventAttendies :many
+SELECT
+	t.tournament_id as ID,
+    t.end_at AS event_date,
+    t.name AS event_name,
+    COUNT(p.player_id) AS number_of_placements
+FROM
+    events e
+JOIN
+    tournaments t ON e.tournament_id = t.tournament_id
+JOIN
+    placements p ON e.event_id = p.event_id
+GROUP BY
+    t.end_at, t.name, t.tournament_id
+ORDER BY
+    t.end_at DESC
+`
+
+type GetEventAttendiesRow struct {
+	ID                 int32
+	EventDate          pgtype.Date
+	EventName          string
+	NumberOfPlacements int64
+}
+
+func (q *Queries) GetEventAttendies(ctx context.Context) ([]GetEventAttendiesRow, error) {
+	rows, err := q.db.Query(ctx, getEventAttendies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetEventAttendiesRow
+	for rows.Next() {
+		var i GetEventAttendiesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.EventDate,
+			&i.EventName,
+			&i.NumberOfPlacements,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMatchHistory = `-- name: GetMatchHistory :many
 SELECT
     ms1.match_id AS MatchID,

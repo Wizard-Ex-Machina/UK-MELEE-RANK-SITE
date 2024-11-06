@@ -1,3 +1,4 @@
+import AttendiesPerEvent from "../_components/_charts/AttendeesPerEvent";
 import MatchesPerQuarter from "../_components/_charts/MatchesPerQuarter";
 import RatingDifferenceChart from "../_components/_charts/RatingDiffEffect";
 import RatingDistribution from "../_components/_charts/ratingDistribution";
@@ -7,9 +8,10 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   const randomMessages = [
     "Send your chart ideas to @WizardExMachina",
-    "I bet you like charts, you filthy perv",
+    "I bet you like these charts, you filthy perv",
     "The line went down this is the worst day of my life",
     "“Here we have a nerd” ~ David Attenborough upon seeing you looking at this page.",
+    "We taught rocks to think, and this is what you use them for?",
   ];
   const randomMessage =
     randomMessages[Math.floor(Math.random() * randomMessages.length)];
@@ -35,11 +37,11 @@ export default function Home() {
           <RatingDistribution color="#8b5cf6" />
         </StatsItem>
         <StatsItem
-          title="Matches Per Quarter"
+          title="Attendees Per Event"
           colorTailwind="bg-gradient-to-r from-teal-500/25 to-teal-700/25 border-teal-500"
-          description="This chart shows the number of matches played per quarter. This is useful for seeing how active the scene is at any given time."
+          description="This chart shows the number of attendees per event over time. It is shown in a logarithmic scale as there are a lot of small events and much fewer large ones."
         >
-          <MatchesPerQuarter color="#14b8a6" />
+          <AttendiesPerEvent color="#14b8a6" />
         </StatsItem>
       </div>
     </>

@@ -21,6 +21,7 @@ func main() {
 	router.GET("/winRateByRatingDifference/:min", api.GetWinRateByRatingDifference)
 	router.GET("/ratingDistruibtion", api.GetRatingDistribution)
 	router.GET("/matchesPerQuarter", api.GetMatchesPerQuarter)
+	router.GET("/eventAttendance", api.GetEventAttendies)
 	router.Run("localhost:8080")
 
 }

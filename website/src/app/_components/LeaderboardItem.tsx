@@ -17,15 +17,18 @@ function getColor(percentile: number) {
     color =
       "bg-gradient-to-r from-emerald-600/25 to-emerald-800/25 border-emerald-500 ";
   }
-  if (percentile > 25) {
+  if (percentile > 30) {
+    color = "bg-gradient-to-r from-sky-600/25 to-sky-800/25 border-sky-500 ";
+  }
+  if (percentile > 47.5) {
     color =
       "bg-gradient-to-r from-yellow-600/25 to-yellow-800/25 border-yellow-500 ";
   }
-  if (percentile > 50) {
+  if (percentile > 65) {
     color =
       "bg-gradient-to-r from-slate-600/25 to-slate-800/25 border-slate-500 ";
   }
-  if (percentile > 75) {
+  if (percentile > 82.5) {
     color =
       "bg-gradient-to-r from-orange-700/25 to-orange-900/25 border-orange-600 ";
   }
