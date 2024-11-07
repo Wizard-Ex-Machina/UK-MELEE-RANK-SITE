@@ -21,7 +21,7 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
+	config.AllowOrigins = []string{"https://meleeranked.uk/"}
 	router.Use(cors.New(config))
 	router.GET("/leaderboard", api.GetLeaderboard)
 	router.GET("/ratingHistory/:id", api.GetRatingHistory)
