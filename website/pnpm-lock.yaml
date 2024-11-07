@@ -20,9 +20,6 @@ importers:
       '@nivo/scatterplot':
         specifier: ^0.87.0
         version: 0.87.0(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
-      Autocomplete:
-        specifier: link:@mui/material/Autocomplete
-        version: link:@mui/material/Autocomplete
       next:
         specifier: 15.0.2
         version: 15.0.2(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
