@@ -47,18 +47,29 @@ func GetMatches(eventID int) []Match {
 	page := 1
 	matches := []Match{}
 	for pageLength > 0 {
-		temp := getMatchesPage(eventID, page)
-		matches = append(matches, temp.Data.Event.Sets.Nodes...)
-		pageLength = len(temp.Data.Event.Sets.Nodes)
+		temp, err := getMatchesPageWrapper(eventID, page, 3)
+		if err == nil {
+			matches = append(matches, temp.Data.Event.Sets.Nodes...)
+			pageLength = len(temp.Data.Event.Sets.Nodes)
+		}
 		page += 1
-
 		time.Sleep(time.Second / 3)
-
 	}
 	return matches
 }
-
-func getMatchesPage(eventID int, page int) MatchRes {
+func getMatchesPageWrapper(eventID int, page int, retries int) (MatchRes, error) {
+	result, err := getMatchesPage(eventID, page)
+	if err != nil {
+		if retries == 0 {
+			return MatchRes{}, err
+		}
+		getMatchesPageWrapper(eventID, page, retries-1)
+		println("something went wrong")
+		time.Sleep(time.Second / 3)
+	}
+	return result, nil
+}
+func getMatchesPage(eventID int, page int) (MatchRes, error) {
 	url := "https://api.start.gg/gql/alpha"
 
 	payload := strings.NewReader("{\"query\":\"query EventSets($eventId: ID!, $page: Int!, $perPage: Int!) {\\n\\tevent(id: $eventId) {\\n\\t\\tsets(page: $page, perPage: $perPage, sortType: STANDARD) {\\n\\t\\t\\tnodes {\\n\\t\\t\\t\\tslots {\\n\\t\\t\\t\\t\\tentrant {\\n\\t\\t\\t\\t\\t\\tparticipants {\\n\\t\\t\\t\\t\\t\\t\\tuser {\\n\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\tplayer {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tgamerTag\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tstanding {\\n\\t\\t\\t\\t\\t\\tstats {\\n\\t\\t\\t\\t\\t\\t\\tscore {\\n\\t\\t\\t\\t\\t\\t\\t\\tvalue\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\\n\\t}\\n}\\n\",\"operationName\":\"EventSets\",\"variables\":\"{\\n\\t\\\"eventId\\\": " + strconv.Itoa(eventID) + ",\\n\\t\\\"page\\\": " + strconv.Itoa(page) + ",\\n\\t\\\"perPage\\\": 45\\n}\"}")
@@ -68,13 +79,16 @@ func getMatchesPage(eventID int, page int) MatchRes {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer "+config.STARTGG_API_TOKEN())
 
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err == nil {
+		defer res.Body.Close()
+		body, _ := ioutil.ReadAll(res.Body)
 
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
+		var responseObject MatchRes
+		json.Unmarshal(body, &responseObject)
+		return responseObject, nil
+	}
 
-	var responseObject MatchRes
-	json.Unmarshal(body, &responseObject)
+	return MatchRes{}, err
 
-	return responseObject
 }
