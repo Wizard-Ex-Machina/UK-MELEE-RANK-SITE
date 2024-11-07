@@ -11,6 +11,7 @@ import (
 
 func main() {
 	godotenv.Load()
+	scraper.Scraper()
 	go func() {
 		cronHandler := cron.New()
 		cronHandler.AddFunc("0 5 * * * *", scraper.Scraper)
