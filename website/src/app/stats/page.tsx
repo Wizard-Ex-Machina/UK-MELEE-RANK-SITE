@@ -21,7 +21,7 @@ export default function Home() {
         title="A Collection Of Charts And Stats About The UK Scene As A Whole"
         subtitle={randomMessage}
       />
-      <div className="grid grid-cols-3 gap-8 p-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 p-2 xl:p-8">
         <StatsItem
           title="Win Rate By Rating Difference"
           colorTailwind="bg-gradient-to-r from-emerald-500/25 to-emerald-700/25 border-emerald-500"

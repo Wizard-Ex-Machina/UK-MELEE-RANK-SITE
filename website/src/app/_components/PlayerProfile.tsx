@@ -13,10 +13,10 @@ export default function PlayerProfile(props: PlayerProfileProps) {
       <div className="h-64">
         <RatingHistoryChart player={props.player} />
       </div>
-      <div className="grid grid-cols-3 gap-2 ">
-        <Opponents player={props.player} />
-        <RecentResults player={props.player} />
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 ">
         <RecentMatches player={props.player} />
+        <RecentResults player={props.player} />
+        <Opponents player={props.player} />
       </div>
     </div>
   );

@@ -2,15 +2,21 @@ package main
 
 import (
 	"api/internal/api"
+	"api/internal/scraper"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron"
 )
 
 func main() {
 	godotenv.Load()
+	go func() {
+		cronHandler := cron.New()
+		cronHandler.AddFunc("0 5 * * * *", scraper.Scraper)
+		cronHandler.Start()
+	}()
 
-	// scraper.Scraper()
 	router := gin.Default()
 
 	router.GET("/leaderboard", api.GetLeaderboard)

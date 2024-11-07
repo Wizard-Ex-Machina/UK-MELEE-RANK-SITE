@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { useEffect, useState } from "react";

@@ -47,25 +47,25 @@ func GetMatches(eventID int) []Match {
 	page := 1
 	matches := []Match{}
 	for pageLength > 0 {
+		time.Sleep(time.Second / 3)
 		temp, err := getMatchesPageWrapper(eventID, page, 3)
 		if err == nil {
 			matches = append(matches, temp.Data.Event.Sets.Nodes...)
 			pageLength = len(temp.Data.Event.Sets.Nodes)
 		}
 		page += 1
-		time.Sleep(time.Second / 3)
 	}
 	return matches
 }
 func getMatchesPageWrapper(eventID int, page int, retries int) (MatchRes, error) {
 	result, err := getMatchesPage(eventID, page)
 	if err != nil {
-		if retries == 0 {
+		if retries <= 0 {
 			return MatchRes{}, err
 		}
-		getMatchesPageWrapper(eventID, page, retries-1)
 		println("something went wrong")
-		time.Sleep(time.Second / 3)
+		time.Sleep(time.Second / 2)
+		return getMatchesPageWrapper(eventID, page, retries-1)
 	}
 	return result, nil
 }

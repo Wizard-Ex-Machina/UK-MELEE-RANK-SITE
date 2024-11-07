@@ -35,9 +35,9 @@ export default async function Home() {
         subtitle={randomMessage}
       />
       <div className="w-full flex justify-center">
-        <div className="w-1/2" key="tcyfvugbhinji">
+        <div className="p-2 w-full xl:w-1/2 xl:p-0" key="tcyfvugbhinji">
           <div
-            className={`my-4 h-12 w-full flex  border-2 rounded-md font-bold px-4 items-center bg-gradient-to-r from-zinc-100/25 to-zinc-300/25 border-zinc-50`}
+            className={`my-4 h-12 max-w-full flex border-2 rounded-md font-bold px-4 items-center bg-gradient-to-r from-zinc-100/25 to-zinc-300/25 border-zinc-50`}
           >
             <div className="w-16 items-center">
               <p className="text-center">RANK</p>
