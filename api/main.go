@@ -20,7 +20,9 @@ func main() {
 	}()
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	router.Use(cors.New(config))
 	router.GET("/leaderboard", api.GetLeaderboard)
 	router.GET("/ratingHistory/:id", api.GetRatingHistory)
 	router.GET("/opponentRecords/:id", api.GetOpponentRecords)
