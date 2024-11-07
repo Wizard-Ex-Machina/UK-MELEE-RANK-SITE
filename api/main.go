@@ -20,7 +20,7 @@ func main() {
 	}()
 
 	router := gin.Default()
-
+	router.Use(cors.Default())
 	router.GET("/leaderboard", api.GetLeaderboard)
 	router.GET("/ratingHistory/:id", api.GetRatingHistory)
 	router.GET("/opponentRecords/:id", api.GetOpponentRecords)
@@ -30,8 +30,7 @@ func main() {
 	router.GET("/ratingDistruibtion", api.GetRatingDistribution)
 	router.GET("/matchesPerQuarter", api.GetMatchesPerQuarter)
 	router.GET("/eventAttendance", api.GetEventAttendies)
-	config := cors.DefaultConfig()
-	router.Use(cors.New(config))
+
 	router.Run()
 
 }
