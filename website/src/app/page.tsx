@@ -6,7 +6,7 @@ import LeaderboardItem from "./_components/LeaderboardItem";
 export const dynamic = "force-dynamic";
 export default async function Home() {
   async function getLeaderboard(): Promise<Player[]> {
-    const res = await fetch("http://localhost:8080/leaderboard", {
+    const res = await fetch("http://95.217.238.224:3001/leaderboard", {
       next: {
         revalidate: 216000,
       },

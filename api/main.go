@@ -4,6 +4,7 @@ import (
 	"api/internal/api"
 	"api/internal/scraper"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron"
@@ -29,6 +30,8 @@ func main() {
 	router.GET("/ratingDistruibtion", api.GetRatingDistribution)
 	router.GET("/matchesPerQuarter", api.GetMatchesPerQuarter)
 	router.GET("/eventAttendance", api.GetEventAttendies)
-	router.Run("localhost:8080")
+	config := cors.DefaultConfig()
+	router.Use(cors.New(config))
+	router.Run()
 
 }

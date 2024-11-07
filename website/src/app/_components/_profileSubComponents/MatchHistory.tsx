@@ -24,7 +24,7 @@ export default function RecentMatches(props: PlayerProfileProps) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:8080/matchHistory/${props.player.PlayerID}`)
+    fetch(`http://95.217.238.224:3001/matchHistory/${props.player.PlayerID}`)
       .then((res) => res.json())
       .then((data) => {
         setMatches(data);

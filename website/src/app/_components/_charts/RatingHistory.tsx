@@ -42,7 +42,7 @@ export default function RatingHistoryChart(props: RatingHistoryChartProps) {
 
   useEffect(() => {
     async function getRatingHistory(id: number): Promise<RatingHistory[]> {
-      const res = await fetch(`http://localhost:8080/ratingHistory/${id}`);
+      const res = await fetch(`http://95.217.238.224:3001/ratingHistory/${id}`);
       const data = await res.json();
       return data;
     }

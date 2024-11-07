@@ -19,7 +19,7 @@ export default function RatingDifferenceChart({ color }: chartProps) {
   useEffect(() => {
     async function getRatingHistory(min: number): Promise<RatingHistory[]> {
       const res = await fetch(
-        `http://localhost:8080/winRateByRatingDifference/${min}`,
+        `http://95.217.238.224:3001/winRateByRatingDifference/${min}`,
       );
       const data = await res.json();
       return data;

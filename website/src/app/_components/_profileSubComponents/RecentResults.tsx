@@ -42,7 +42,7 @@ export default function RecentResults(props: PlayerProfileProps) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:8080/recentResults/${props.player.PlayerID}`)
+    fetch(`http://95.217.238.224:3001/recentResults/${props.player.PlayerID}`)
       .then((res) => res.json())
       .then((data) => {
         setResults(data);
