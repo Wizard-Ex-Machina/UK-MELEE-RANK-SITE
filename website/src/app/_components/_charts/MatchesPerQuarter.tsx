@@ -18,7 +18,7 @@ export default function MatchesPerQuarter({ color }: chartProps) {
 
   useEffect(() => {
     async function getRatingHistory(min: number): Promise<RatingHistory[]> {
-      const res = await fetch(`http://95.217.238.224:3001/matchesPerQuarter`);
+      const res = await fetch(`https://meleeranked.uk/api/matchesPerQuarter`);
       const data = await res.json();
       return data;
     }

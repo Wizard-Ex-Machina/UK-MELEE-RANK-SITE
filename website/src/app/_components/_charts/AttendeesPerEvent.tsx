@@ -18,7 +18,7 @@ export default function AttendiesPerEvent({ color }: props) {
 
   useEffect(() => {
     async function getEvent(): Promise<Event[]> {
-      const res = await fetch(`http://95.217.238.224:3001/eventAttendance`);
+      const res = await fetch(`https://meleeranked.uk/api/eventAttendance`);
       const data = await res.json();
       return data;
     }

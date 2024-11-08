@@ -22,7 +22,7 @@ export default function Opponents(props: PlayerProfileProps) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
-    fetch(`http://95.217.238.224:3001/opponentRecords/${props.player.PlayerID}`)
+    fetch(`https://meleeranked.uk/api/opponentRecords/${props.player.PlayerID}`)
       .then((res) => res.json())
       .then((data) => {
         setOpponents(data);
