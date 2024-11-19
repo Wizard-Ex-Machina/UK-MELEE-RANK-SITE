@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { playfair_dislpay, bebas_neue, space_mono } from "../fonts";
+import { playfair_dislpay, bebas_neue } from "../fonts";
 
 type TitlebarProps = {
   title: string;

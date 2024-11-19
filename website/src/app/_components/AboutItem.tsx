@@ -1,8 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Player } from "@/app/page";
-import { ResponsiveLine, Line } from "@nivo/line";
-import { format } from "path";
 import { PropsWithChildren } from "react";
 
 type RatingHistoryChartProps = {

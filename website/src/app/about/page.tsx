@@ -1,6 +1,4 @@
-import { playfair_dislpay, bebas_neue } from "../fonts";
 import Titlebar from "../_components/Titlebar";
-import StatsItem from "../_components/StatsItem";
 import AboutItem from "../_components/AboutItem";
 
 export default function Home() {

@@ -1,10 +1,11 @@
 import AttendiesPerEvent from "../_components/_charts/AttendeesPerEvent";
-import MatchesPerQuarter from "../_components/_charts/MatchesPerQuarter";
 import RatingDifferenceChart from "../_components/_charts/RatingDiffEffect";
 import RatingDistribution from "../_components/_charts/ratingDistribution";
 import StatsItem from "../_components/StatsItem";
 import Titlebar from "../_components/Titlebar";
+
 export const dynamic = "force-dynamic";
+
 export default function Home() {
   const randomMessages = [
     "Send your chart ideas to @WizardExMachina",
@@ -13,8 +14,10 @@ export default function Home() {
     "“Here we have a nerd” ~ David Attenborough upon seeing you looking at this page.",
     "We taught rocks to think, and this is what you use them for?",
   ];
+
   const randomMessage =
     randomMessages[Math.floor(Math.random() * randomMessages.length)];
+
   return (
     <>
       <Titlebar

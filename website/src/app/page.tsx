@@ -1,9 +1,9 @@
 import { playfair_dislpay, bebas_neue } from "./fonts";
 import Titlebar from "./_components/Titlebar";
-import { log } from "console";
 import LeaderboardItem from "./_components/LeaderboardItem";
 
 export const dynamic = "force-dynamic";
+
 export default async function Home() {
   async function getLeaderboard(): Promise<Player[]> {
     const res = await fetch("https://meleeranked.uk/api/leaderboard", {
@@ -23,6 +23,7 @@ export default async function Home() {
     "You, again? and I thought my ego was inflated",
     "Your rating is not gonna go up if you keep looking at this page, go win some games",
   ];
+
   const randomMessage =
     randomMessages[Math.floor(Math.random() * randomMessages.length)];
 
