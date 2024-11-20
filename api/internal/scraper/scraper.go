@@ -7,13 +7,12 @@ import (
 	"cmp"
 	"context"
 	"fmt"
-	"log"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
 	glicko "github.com/ShewkShewk/go-glicko2"
+	"github.com/gosuri/uilive"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	_ "github.com/lib/pq"
@@ -25,11 +24,12 @@ func Scraper() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	println("fetching events")
+	writer := uilive.New()
+	writer.Start()
+	fmt.Fprint(writer.Bypass(), "fetching events")
 
 	queries := postgres.New(db)
 	events := startgg.GetEvents()
-	println("processing events")
 	slices.SortFunc(events, func(a, b startgg.Tournaments) int {
 		return cmp.Compare(a.EndAt, b.EndAt)
 	})
@@ -43,9 +43,6 @@ func Scraper() {
 			dbTournament, err := queries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true},
 				CountryCode: tournament.CountryCode,
 				Slug:        tournament.Slug, EndAt: pgtype.Date{Time: time.Unix(int64(tournament.EndAt), 0), Valid: true}})
-			if err != nil {
-				fmt.Println(err)
-			}
 
 			if err == nil {
 				for _, event := range tournament.Events {
@@ -53,12 +50,9 @@ func Scraper() {
 					if event.Videogame.Id == 1 && (slices.Contains([]string{"MELEE", "SINGLES", "SUPER SMASH BROS. MELEE", "SUPER SMASH BROS. MELEE - SINGLES"}, strings.ToUpper(event.Name)) || strings.Contains(strings.ToUpper(event.Name), "MELEE SINGLES")) {
 						//Create event in database
 						dbEvent, err := queries.CreateEvent(ctx, postgres.CreateEventParams{Name: event.Name, TournamentID: dbTournament.TournamentID, StartGgID: int32(event.Id)})
-						if err != nil {
-							fmt.Println(err)
-						} else {
+						if err == nil {
+							logProgress(writer, float64(i)/float64(len(events)), tournament.Name)
 							matches := startgg.GetMatches(event.Id)
-
-							fmt.Println(strconv.Itoa(i) + "/" + strconv.Itoa(len(events)) + "	" + tournament.Name + ":" + strconv.Itoa(len(matches)))
 							for _, match := range matches {
 								if MatchConditions(match) {
 
@@ -84,7 +78,6 @@ func Scraper() {
 									_, err := SaveMatchSlot(ctx, queries, match.Slots[0].Standing.Stats.Score.Value, match.Slots[0].Standing.Stats.Score.Value > match.Slots[1].Standing.Stats.Score.Value, player1, glickoPlayer1, dbMatch, oldRating1)
 									_, err2 := SaveMatchSlot(ctx, queries, match.Slots[1].Standing.Stats.Score.Value, match.Slots[1].Standing.Stats.Score.Value > match.Slots[0].Standing.Stats.Score.Value, player2, glickoPlayer2, dbMatch, oldRating2)
 									if err != nil || err2 != nil {
-										log.Println(err)
 									}
 								}
 							}
@@ -93,10 +86,8 @@ func Scraper() {
 							placements := startgg.GetPlacements(event.Id)
 							for _, placement := range placements {
 								player, _ := queries.GetPlayerFromAlias(ctx, int32(placement.Entrant.Particpants[0].User.Id))
-								_, err := queries.CreatePlacement(ctx, postgres.CreatePlacementParams{PlayerID: player.PlayerID, EventID: dbEvent.EventID, Placement: int32(placement.Placement)})
-								if err != nil {
-									log.Println(err)
-								}
+								queries.CreatePlacement(ctx, postgres.CreatePlacementParams{PlayerID: player.PlayerID, EventID: dbEvent.EventID, Placement: int32(placement.Placement)})
+
 							}
 						}
 					}
@@ -105,9 +96,18 @@ func Scraper() {
 		}
 	}
 	defer db.Close(ctx)
-
+	writer.Stop()
 }
 
+func logProgress(line1 *uilive.Writer, totalProgress float64, event string) {
+	_, _ = fmt.Fprintf(line1, "Processing Events: %s\n", event)
+	bar := progressbar(100, totalProgress)
+	_, _ = fmt.Fprintf(line1.Newline(), "Total Progress: %s\n", bar)
+}
+func progressbar(width int, percent float64) string {
+	n := int(float64(width) * percent)
+	return "[" + strings.Repeat("#", n) + strings.Repeat(" ", width-n) + "]"
+}
 func MatchConditions(match startgg.Match) bool {
 	if !(len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants) == 2) {
 		return false
@@ -164,7 +164,6 @@ func GetOrCreatePlayer(ctx context.Context, queries *postgres.Queries, match sta
 			playerRating := glicko.NewPlayer(glicko.NewRating(float64(2500), float64(300), float64(0.05)))
 			return player, playerRating
 		} else {
-			fmt.Println(err)
 		}
 	}
 	//Get Players most recent match
@@ -173,8 +172,6 @@ func GetOrCreatePlayer(ctx context.Context, queries *postgres.Queries, match sta
 		if err.Error() == "no rows in result set" {
 			playerRating := glicko.NewPlayer(glicko.NewRating(float64(2500), float64(300), float64(0.05)))
 			return player, playerRating
-		} else {
-			fmt.Println(err)
 		}
 	}
 	r, _ := mostRecentMatch.R.Float64Value()

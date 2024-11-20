@@ -34,5 +34,4 @@ func main() {
 	router.GET("/api/eventAttendance", api.GetEventAttendies)
 
 	router.Run()
-
 }
