@@ -107,12 +107,28 @@ func Scraper() {
 }
 
 func MatchConditions(match startgg.Match) bool {
-	if (len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants)) == 2 && match.Slots[1].Standing.Stats.Score.Value != -1 && match.Slots[0].Standing.Stats.Score.Value != -1 {
-		if match.Slots[0].Entrant.Participants[0].User.Id != match.Slots[1].Entrant.Participants[0].User.Id {
-			return true
-		}
+	if !(len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants) == 2) {
+		return false
 	}
-	return false
+	if match.Slots[0].Standing.Stats.Score.Value == -1 {
+		return false
+	}
+	if match.Slots[1].Standing.Stats.Score.Value == -1 {
+		return false
+	}
+	if match.Slots[0].Entrant.Participants[0].User.Id == match.Slots[1].Entrant.Participants[0].User.Id {
+		return false
+	}
+	if match.Slots[0].Standing.Stats.Score.Value == 0 && match.Slots[1].Standing.Stats.Score.Value == 0 {
+		return false
+	}
+	if match.Slots[0].Entrant.Participants[0].User.Player.GamerTag == "" {
+		return false
+	}
+	if match.Slots[1].Entrant.Participants[0].User.Player.GamerTag == "" {
+		return false
+	}
+	return true
 }
 
 func SaveMatchSlot(ctx context.Context, queries *postgres.Queries, score int, win bool, player postgres.Player, rating *glicko.Player, match postgres.Match, oldRating float64) (postgres.MatchSlot, error) {

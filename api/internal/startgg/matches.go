@@ -47,7 +47,7 @@ func GetMatches(eventID int) []Match {
 	page := 1
 	matches := []Match{}
 	for pageLength > 0 {
-		time.Sleep(time.Second / 3)
+		time.Sleep(time.Second / 2)
 		temp, err := getMatchesPageWrapper(eventID, page, 3)
 		if err == nil {
 			matches = append(matches, temp.Data.Event.Sets.Nodes...)
