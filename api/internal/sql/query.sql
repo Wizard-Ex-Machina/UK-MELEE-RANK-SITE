@@ -106,8 +106,8 @@ INSERT INTO player_aliases (player_id, start_gg_id) VALUES ($1, $2) RETURNING *;
 
 -- name: CreateTournament :one
 -- This query will fail if the slug already exists
-INSERT INTO tournaments (name, postcode, end_at, slug)
-VALUES ($1, $2, $3, $4)
+INSERT INTO tournaments (name, postcode, country_code, end_at, slug)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: CreateEvent :one

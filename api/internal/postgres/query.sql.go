@@ -182,16 +182,17 @@ func (q *Queries) CreateRating(ctx context.Context, arg CreateRatingParams) (Rat
 }
 
 const createTournament = `-- name: CreateTournament :one
-INSERT INTO tournaments (name, postcode, end_at, slug)
-VALUES ($1, $2, $3, $4)
-RETURNING tournament_id, name, postcode, end_at, slug
+INSERT INTO tournaments (name, postcode, country_code, end_at, slug)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING tournament_id, name, postcode, end_at, country_code, slug
 `
 
 type CreateTournamentParams struct {
-	Name     string
-	Postcode pgtype.Text
-	EndAt    pgtype.Date
-	Slug     string
+	Name        string
+	Postcode    pgtype.Text
+	CountryCode string
+	EndAt       pgtype.Date
+	Slug        string
 }
 
 // This query will fail if the slug already exists
@@ -199,6 +200,7 @@ func (q *Queries) CreateTournament(ctx context.Context, arg CreateTournamentPara
 	row := q.db.QueryRow(ctx, createTournament,
 		arg.Name,
 		arg.Postcode,
+		arg.CountryCode,
 		arg.EndAt,
 		arg.Slug,
 	)
@@ -208,6 +210,7 @@ func (q *Queries) CreateTournament(ctx context.Context, arg CreateTournamentPara
 		&i.Name,
 		&i.Postcode,
 		&i.EndAt,
+		&i.CountryCode,
 		&i.Slug,
 	)
 	return i, err
@@ -504,10 +507,18 @@ ORDER BY
 LIMIT 1
 `
 
+type GetMostRecentTournamentRow struct {
+	TournamentID int32
+	Name         string
+	Postcode     pgtype.Text
+	EndAt        pgtype.Date
+	Slug         string
+}
+
 // This query will fail if there are no tournaments
-func (q *Queries) GetMostRecentTournament(ctx context.Context) (Tournament, error) {
+func (q *Queries) GetMostRecentTournament(ctx context.Context) (GetMostRecentTournamentRow, error) {
 	row := q.db.QueryRow(ctx, getMostRecentTournament)
-	var i Tournament
+	var i GetMostRecentTournamentRow
 	err := row.Scan(
 		&i.TournamentID,
 		&i.Name,

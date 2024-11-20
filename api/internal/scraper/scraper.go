@@ -40,7 +40,9 @@ func Scraper() {
 
 	for i, tournament := range events {
 		if dbMostRecent.EndAt.Time.Unix() < int64(tournament.EndAt) {
-			dbTournament, err := queries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true}, Slug: tournament.Slug, EndAt: pgtype.Date{Time: time.Unix(int64(tournament.EndAt), 0), Valid: true}})
+			dbTournament, err := queries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true},
+				CountryCode: tournament.CountryCode,
+				Slug:        tournament.Slug, EndAt: pgtype.Date{Time: time.Unix(int64(tournament.EndAt), 0), Valid: true}})
 			if err != nil {
 				fmt.Println(err)
 			}
