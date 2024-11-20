@@ -119,6 +119,12 @@ func MatchConditions(match startgg.Match) bool {
 	if match.Slots[0].Entrant.Participants[0].User.Id == match.Slots[1].Entrant.Participants[0].User.Id {
 		return false
 	}
+	if match.Slots[0].Entrant.Participants[0].User.Id == 0 {
+		return false
+	}
+	if match.Slots[1].Entrant.Participants[0].User.Id == 0 {
+		return false
+	}
 	if match.Slots[0].Standing.Stats.Score.Value == 0 && match.Slots[1].Standing.Stats.Score.Value == 0 {
 		return false
 	}
