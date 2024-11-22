@@ -61,5 +61,6 @@ type Tournament struct {
 	Name         string
 	Postcode     pgtype.Text
 	EndAt        pgtype.Date
+	CountryCode  string
 	Slug         string
 }
