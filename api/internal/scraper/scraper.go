@@ -90,6 +90,7 @@ func Scraper() {
 											// 	PreRating:   ConvertFloatToPgtypeNumeric(oldRating1),
 											// 	CharacterID: pgtype.Int4{Int32: int32(game.Selections[0].Character.Id)},
 											// })
+											// changes
 											println(game)
 										}
 
