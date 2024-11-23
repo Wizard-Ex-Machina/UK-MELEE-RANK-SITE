@@ -20,6 +20,15 @@ type Match struct {
 	EventID int32
 }
 
+type MatchCharacter struct {
+	MatchID     int32
+	PlayerID    int32
+	GameNumber  int32
+	Win         pgtype.Bool
+	PreRating   pgtype.Numeric
+	CharacterID pgtype.Int4
+}
+
 type MatchSlot struct {
 	MatchID  int32
 	PlayerID int32

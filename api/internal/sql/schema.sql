@@ -51,6 +51,17 @@ CREATE TABLE IF NOT EXISTS match_slot (
   PRIMARY KEY (match_id, player_id)
 );
 
+CREATE TABLE IF NOT EXISTS match_characters (
+  match_id int NOT NULL,
+  player_id int NOT NULL,
+  game_number int NOT NULL,
+  win BOOLEAN,
+  pre_rating NUMERIC,
+  character_id int,
+  FOREIGN KEY (match_id) REFERENCES matches(match_id),
+  FOREIGN KEY (player_id) REFERENCES players(player_id),
+  PRIMARY KEY (match_id, player_id, game_number)
+);
 
 CREATE TABLE IF NOT EXISTS player_aliases (
   player_id int NOT NULL,

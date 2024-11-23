@@ -79,15 +79,30 @@ func Scraper() {
 									_, err2 := SaveMatchSlot(ctx, queries, match.Slots[1].Standing.Stats.Score.Value, match.Slots[1].Standing.Stats.Score.Value > match.Slots[0].Standing.Stats.Score.Value, player2, glickoPlayer2, dbMatch, oldRating2)
 									if err != nil || err2 != nil {
 									}
+
+									if len(match.Games) > 0 {
+										for _, game := range match.Games {
+											// queries.CreateGameData(ctx, postgres.CreateGameDataParams{
+											// 	MatchID:     dbMatch.MatchID,
+											// 	PlayerID:    0,
+											// 	GameNumber:  int32(i),
+											// 	Win:         pgtype.Bool{Bool: true},
+											// 	PreRating:   ConvertFloatToPgtypeNumeric(oldRating1),
+											// 	CharacterID: pgtype.Int4{Int32: int32(game.Selections[0].Character.Id)},
+											// })
+											println(game)
+										}
+
+									}
 								}
-							}
-							// get placements from event
+								// get placements from event
 
-							placements := startgg.GetPlacements(event.Id)
-							for _, placement := range placements {
-								player, _ := queries.GetPlayerFromAlias(ctx, int32(placement.Entrant.Particpants[0].User.Id))
-								queries.CreatePlacement(ctx, postgres.CreatePlacementParams{PlayerID: player.PlayerID, EventID: dbEvent.EventID, Placement: int32(placement.Placement)})
+								placements := startgg.GetPlacements(event.Id)
+								for _, placement := range placements {
+									player, _ := queries.GetPlayerFromAlias(ctx, int32(placement.Entrant.Particpants[0].User.Id))
+									queries.CreatePlacement(ctx, postgres.CreatePlacementParams{PlayerID: player.PlayerID, EventID: dbEvent.EventID, Placement: int32(placement.Placement)})
 
+								}
 							}
 						}
 					}

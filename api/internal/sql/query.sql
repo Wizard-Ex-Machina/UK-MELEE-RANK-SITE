@@ -1,3 +1,7 @@
+-- name: CreateGameData :one
+-- This query will fail if the player_id does not exist
+INSERT INTO match_characters (match_id, player_id, game_number, win, pre_rating, character_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
+
 -- name: GetPlayers :many
 SELECT * FROM players;
 

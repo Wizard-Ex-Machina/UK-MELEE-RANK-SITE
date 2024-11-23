@@ -34,6 +34,41 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event
 	return i, err
 }
 
+const createGameData = `-- name: CreateGameData :one
+INSERT INTO match_characters (match_id, player_id, game_number, win, pre_rating, character_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING match_id, player_id, game_number, win, pre_rating, character_id
+`
+
+type CreateGameDataParams struct {
+	MatchID     int32
+	PlayerID    int32
+	GameNumber  int32
+	Win         pgtype.Bool
+	PreRating   pgtype.Numeric
+	CharacterID pgtype.Int4
+}
+
+// This query will fail if the player_id does not exist
+func (q *Queries) CreateGameData(ctx context.Context, arg CreateGameDataParams) (MatchCharacter, error) {
+	row := q.db.QueryRow(ctx, createGameData,
+		arg.MatchID,
+		arg.PlayerID,
+		arg.GameNumber,
+		arg.Win,
+		arg.PreRating,
+		arg.CharacterID,
+	)
+	var i MatchCharacter
+	err := row.Scan(
+		&i.MatchID,
+		&i.PlayerID,
+		&i.GameNumber,
+		&i.Win,
+		&i.PreRating,
+		&i.CharacterID,
+	)
+	return i, err
+}
+
 const createMatch = `-- name: CreateMatch :one
 INSERT INTO matches (event_id) VALUES ($1) RETURNING match_id, event_id
 `
