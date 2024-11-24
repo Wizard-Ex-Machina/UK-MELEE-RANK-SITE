@@ -40,7 +40,6 @@ func GetEvents() []Tournaments {
 	page := 1
 	tournaments := []Tournaments{}
 	for pageLength > 0 {
-
 		temp := getEventsPage(page)
 		tournaments = append(tournaments, temp.Data.Tournaments.Nodes...)
 		pageLength = len(temp.Data.Tournaments.Nodes)

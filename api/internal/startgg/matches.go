@@ -74,7 +74,6 @@ func GetMatches(eventID int) []Match {
 		time.Sleep(time.Second * 3 / 5)
 		temp, err := getMatchesPageWrapper(eventID, page, 3)
 		if err == nil {
-			println(temp.Extensions.QueryComplexity)
 			matches = append(matches, temp.Data.Event.Sets.Nodes...)
 			pageLength = len(temp.Data.Event.Sets.Nodes)
 		}
