@@ -24,9 +24,9 @@ type MatchCharacter struct {
 	MatchID     int32
 	PlayerID    int32
 	GameNumber  int32
-	Win         pgtype.Bool
+	Win         bool
 	PreRating   pgtype.Numeric
-	CharacterID pgtype.Int4
+	CharacterID int32
 }
 
 type MatchSlot struct {

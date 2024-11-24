@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS match_characters (
   match_id int NOT NULL,
   player_id int NOT NULL,
   game_number int NOT NULL,
-  win BOOLEAN,
+  win BOOLEAN NOT NULL,
   pre_rating NUMERIC,
-  character_id int,
+  character_id int NOT NULL,
   FOREIGN KEY (match_id) REFERENCES matches(match_id),
   FOREIGN KEY (player_id) REFERENCES players(player_id),
   PRIMARY KEY (match_id, player_id, game_number)

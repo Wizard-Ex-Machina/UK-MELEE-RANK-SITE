@@ -47,7 +47,7 @@ func GetPlacements(eventID int) []Placement {
 		pageLength = len(temp.Data.Event.Standings.Nodes)
 		page += 1
 
-		time.Sleep(time.Second / 3)
+		time.Sleep(time.Second * 4 / 5)
 
 	}
 	return tournaments
