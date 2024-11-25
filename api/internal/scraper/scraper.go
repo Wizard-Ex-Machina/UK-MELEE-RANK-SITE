@@ -26,18 +26,20 @@ func Scraper() {
 	}
 	writer := uilive.New()
 	writer.Start()
-	fmt.Fprint(writer.Bypass(), "fetching events")
 
 	queries := postgres.New(db)
-	events := startgg.GetEvents()
-	slices.SortFunc(events, func(a, b startgg.Tournaments) int {
-		return cmp.Compare(a.EndAt, b.EndAt)
-	})
 
 	// get most recent tournament
 	// filter for only new events
 	dbMostRecent, err := queries.GetMostRecentTournament(ctx)
-
+	startDate := time.Date(2014, 1, 1, 0, 0, 0, 0, time.UTC)
+	if dbMostRecent.EndAt.Time.Unix() > 0 {
+		startDate = dbMostRecent.EndAt.Time
+	}
+	events := startgg.GetEvents(startDate)
+	slices.SortFunc(events, func(a, b startgg.Tournaments) int {
+		return cmp.Compare(a.EndAt, b.EndAt)
+	})
 	for i, tournament := range events {
 		if dbMostRecent.EndAt.Time.Unix() < int64(tournament.EndAt) {
 			dbTournament, err := queries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true},

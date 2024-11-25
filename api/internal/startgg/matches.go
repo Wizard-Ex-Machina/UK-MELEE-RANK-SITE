@@ -67,15 +67,17 @@ type Match struct {
 }
 
 func GetMatches(eventID int) []Match {
-	pageLength := 1
+	pageLength := 20
 	page := 1
 	matches := []Match{}
-	for pageLength > 0 {
-		time.Sleep(time.Second * 3 / 5)
+	for pageLength >= 20 {
+		time.Sleep(time.Second * 7 / 10)
 		temp, err := getMatchesPageWrapper(eventID, page, 3)
 		if err == nil {
 			matches = append(matches, temp.Data.Event.Sets.Nodes...)
 			pageLength = len(temp.Data.Event.Sets.Nodes)
+		} else {
+			pageLength = 0
 		}
 		page += 1
 	}
@@ -88,7 +90,7 @@ func getMatchesPageWrapper(eventID int, page int, retries int) (MatchRes, error)
 			return MatchRes{}, err
 		}
 		println("something went wrong")
-		time.Sleep(time.Second * 3 / 5)
+		time.Sleep(time.Second)
 		return getMatchesPageWrapper(eventID, page, retries-1)
 	}
 	return result, nil
