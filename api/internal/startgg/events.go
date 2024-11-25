@@ -58,7 +58,7 @@ func GetEvents(startDate time.Time) []Tournaments {
 	writer.Start()
 
 	tournaments := []Tournaments{}
-	for before.Unix() < time.Now().AddDate(-7, 0, 0).Unix() {
+	for before.Unix() < time.Now().Unix() {
 		logProgress(writer, float64(before.Unix()-startDate.Unix())/float64(time.Now().Unix()-startDate.Unix()), before.Format("2006-01-02"), strconv.Itoa(len(tournaments)))
 		for pageLength >= 80 {
 			time.Sleep(time.Second * 7 / 10)
