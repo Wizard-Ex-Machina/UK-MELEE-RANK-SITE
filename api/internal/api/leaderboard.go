@@ -51,23 +51,24 @@ func GetLeaderboard(c *gin.Context) {
 			return cmp.Compare(a.Playerid, b.Playerid)
 		})
 		if !found {
-		}
-		R, _ := currentLeaderboard[i].R.Float64Value()
-		OldR, _ := lastLeaderboard[n].R.Float64Value()
-		Delta := R.Float64 - OldR.Float64
-		RankDiff := lastLeaderboard[n].Rank - currentLeaderboard[i].Rank
-		Rd, _ := currentLeaderboard[i].Rd.Float64Value()
 
-		leaderboard = append(leaderboard, leaderboardItem{
-			PlayerID:   currentLeaderboard[i].Playerid,
-			Name:       currentLeaderboard[i].Name,
-			Rank:       currentLeaderboard[i].Rank,
-			RankDiff:   RankDiff,
-			R:          R.Float64,
-			Rd:         Rd.Float64,
-			Delta:      Delta,
-			Percentile: float64(i+1) / float64(len(currentLeaderboard)) * 100,
-		})
+			R, _ := currentLeaderboard[i].R.Float64Value()
+			OldR, _ := lastLeaderboard[n].R.Float64Value()
+			Delta := R.Float64 - OldR.Float64
+			RankDiff := lastLeaderboard[n].Rank - currentLeaderboard[i].Rank
+			Rd, _ := currentLeaderboard[i].Rd.Float64Value()
+
+			leaderboard = append(leaderboard, leaderboardItem{
+				PlayerID:   currentLeaderboard[i].Playerid,
+				Name:       currentLeaderboard[i].Name,
+				Rank:       currentLeaderboard[i].Rank,
+				RankDiff:   RankDiff,
+				R:          R.Float64,
+				Rd:         Rd.Float64,
+				Delta:      Delta,
+				Percentile: float64(i+1) / float64(len(currentLeaderboard)) * 100,
+			})
+		}
 	}
 	defer db.Close(ctx)
 	c.IndentedJSON(http.StatusOK, leaderboard)
