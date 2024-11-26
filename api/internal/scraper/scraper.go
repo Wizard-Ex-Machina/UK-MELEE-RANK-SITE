@@ -103,7 +103,7 @@ func Scraper() {
 															CharacterID: int32(selection.Character.Id),
 														})
 													}
-												}git
+												}
 											}
 										}
 									}
