@@ -103,7 +103,7 @@ func Scraper() {
 															CharacterID: int32(selection.Character.Id),
 														})
 													}
-												}
+												}git
 											}
 										}
 									}
@@ -134,6 +134,9 @@ func progressbar(width int, percent float64) string {
 	return "[" + strings.Repeat("#", n) + strings.Repeat(" ", width-n) + "]"
 }
 func matchConditions(match startgg.Match) bool {
+	if !(len(match.Slots) == 2) {
+		return false
+	}
 	if !(len(match.Slots[0].Entrant.Participants)+len(match.Slots[1].Entrant.Participants) == 2) {
 		return false
 	}
