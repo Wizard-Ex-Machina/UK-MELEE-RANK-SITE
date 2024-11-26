@@ -50,7 +50,7 @@ func GetLeaderboard(c *gin.Context) {
 		n, found := slices.BinarySearchFunc(lastLeaderboard, currentLeaderboard[i], func(a postgres.LastWeekLeaderboardRow, b postgres.CurrentLeaderboardRow) int {
 			return cmp.Compare(a.Playerid, b.Playerid)
 		})
-		if !found {
+		if found {
 
 			R, _ := currentLeaderboard[i].R.Float64Value()
 			OldR, _ := lastLeaderboard[n].R.Float64Value()
