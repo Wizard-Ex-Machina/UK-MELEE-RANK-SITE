@@ -89,18 +89,20 @@ func Scraper() {
 													win := game.WinnerId == selection.Entrant.Id
 													player := player1
 													oldRating := oldRating1
-													if selection.Entrant.Participants[0].User.Id != match.Slots[0].Entrant.Participants[0].User.Id {
-														player = player2
-														oldRating = oldRating2
+													if len(selection.Entrant.Participants) > 0 {
+														if selection.Entrant.Participants[0].User.Id != match.Slots[0].Entrant.Participants[0].User.Id {
+															player = player2
+															oldRating = oldRating2
+														}
+														queries.CreateGameData(ctx, postgres.CreateGameDataParams{
+															MatchID:     dbMatch.MatchID,
+															PlayerID:    player.PlayerID,
+															GameNumber:  int32(i),
+															Win:         win,
+															PreRating:   convertFloatToPgtypeNumeric(oldRating),
+															CharacterID: int32(selection.Character.Id),
+														})
 													}
-													queries.CreateGameData(ctx, postgres.CreateGameDataParams{
-														MatchID:     dbMatch.MatchID,
-														PlayerID:    player.PlayerID,
-														GameNumber:  int32(i),
-														Win:         win,
-														PreRating:   convertFloatToPgtypeNumeric(oldRating),
-														CharacterID: int32(selection.Character.Id),
-													})
 												}
 											}
 										}
