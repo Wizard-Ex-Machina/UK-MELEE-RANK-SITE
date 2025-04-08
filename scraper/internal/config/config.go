@@ -21,7 +21,7 @@ func PORT() (string, error) {
 	return "3001", errors.New("PORT not inculded in env defaulting to 3001")
 }
 
-func DATABASE_URL() (string, error) {
+func REGIONAL_DATABASE_URL() (string, error) {
 	data := os.Getenv("DATABASE_URL")
 	if data != "" {
 		return data, nil
@@ -38,7 +38,7 @@ func REGION_CODE() (string, error) {
 }
 
 func GLOBAL() (bool, error) {
-	data := os.Getenv("REGION_CODE")
+	data := os.Getenv("GLOBAL")
 	if data == "TRUE" {
 		return true, nil
 	}
@@ -46,4 +46,12 @@ func GLOBAL() (bool, error) {
 		return false, nil
 	}
 	return false, errors.New("GLOBAL missing from env defaulting to false")
+}
+
+func GLOBAL_DATEBASE_URL() (string, error) {
+	data := os.Getenv("GLOBAL_DATABASE_URL")
+	if data != "" {
+		return data, nil
+	}
+	return "", errors.New("GLOBAL_DATABASE_URL not inculded in env")
 }
