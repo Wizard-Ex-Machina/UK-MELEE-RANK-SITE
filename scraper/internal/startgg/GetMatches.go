@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"scraper/internal/config"
 	"strconv"
 	"strings"
 	"time"
@@ -77,7 +78,8 @@ type Score struct {
 	Value int `json:"value"`
 }
 
-func GetMatches(eventID int, token string) ([]Set, error) {
+func GetMatches(eventID int) ([]Set, error) {
+	token, _ := config.STARTGG_API_TOKEN()
 	pageLength, page, retries := 1, 1, 0
 	sets := []Set{}
 	for pageLength > 0 {
@@ -104,11 +106,11 @@ func GetMatches(eventID int, token string) ([]Set, error) {
 		}
 
 	}
-	println("found " + strconv.Itoa(len(sets)) + " matches")
 	return sets, nil
 }
 
 func getMatchesPage(eventID int, page int, token string) ([]Set, error) {
+
 	url := "https://api.start.gg/gql/alpha"
 
 	payload := strings.NewReader("{\n  \"query\": \"query ($eventId: ID, $page: Int!) {\\n\\t\\t\\tevent(id: $eventId) {\\n\\t\\t\\t\\tsets(page: $page, perPage: 20, sortType: CALL_ORDER) {\\n\\t\\t\\t\\t\\tnodes {\\n\\t\\t\\t\\t\\t\\tgames {\\n\\t\\t\\t\\t\\t\\t\\twinnerId\\n\\t\\t\\t\\t\\t\\t\\torderNum\\n\\t\\t\\t\\t\\t\\t\\tselections {\\n\\t\\t\\t\\t\\t\\t\\t\\tentrant {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tparticipants{\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tuser{\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\tcharacter {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\tslots {\\n\\t\\t\\t\\t\\t\\t\\tentrant {\\n\\t\\t\\t\\t\\t\\t\\t\\tparticipants {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tuser {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tplayer {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tgamerTag\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\tstanding {\\n\\t\\t\\t\\t\\t\\t\\t\\tstats {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tscore {\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tvalue\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t}\\n\\t\\t}\",\n  \"variables\": {\n    \"eventId\": " + strconv.Itoa(eventID) + ",\n    \"page\": " + strconv.Itoa(page) + ",\n    \"perPage\": 20\n  }\n}")

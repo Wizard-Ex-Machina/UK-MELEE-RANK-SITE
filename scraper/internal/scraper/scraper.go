@@ -1,13 +1,31 @@
 package scraper
 
 import (
-	"context"
-
-	"github.com/jackc/pgx/v5"
+	"scraper/internal/startgg"
 )
 
-func Scraper(
-	database *pgx.Conn,
-	ctx context.Context,
-) {
+func Scraper() {
+	events, err := startgg.GetEvents()
+	if err != nil {
+		// Handle error
+		return
+	}
+
+	for _, event := range events {
+		// Process event
+		matches, err := startgg.GetMatches(event.Id)
+		if err != nil {
+			// Handle error
+			continue
+		}
+		for _, match := range matches {
+			// Process match
+			err := processMatch(match, event)
+			if err != nil {
+				// Handle error
+				continue
+			}
+		}
+	}
+
 }
