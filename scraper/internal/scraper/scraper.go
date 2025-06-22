@@ -1,31 +1,77 @@
 package scraper
 
 import (
+	"cmp"
+	"context"
+	"scraper/internal/config"
+	"scraper/internal/postgres"
 	"scraper/internal/startgg"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func Scraper() {
+	ctx := context.Background()
+	dburl, err := config.GLOBAL_DATEBASE_URL()
+	if err != nil {
+		panic(err)
+	}
+	db, err := pgx.Connect(ctx, dburl)
+	if err != nil {
+		panic(err)
+	}
 	events, err := startgg.GetEvents()
+	qurries := postgres.New(db)
 	if err != nil {
 		// Handle error
 		return
 	}
+	slices.SortFunc(events, func(a, b startgg.Tournament) int {
+		return cmp.Compare(a.EndAt, b.EndAt)
+	})
 
-	for _, event := range events {
-		// Process event
-		matches, err := startgg.GetMatches(event.Id)
-		if err != nil {
-			// Handle error
+	for _, tournament := range events {
+		// create tournament in db
+		tournamentDB, tournamenterr := qurries.CreateTournament(ctx, postgres.CreateTournamentParams{Name: tournament.Name, CountryCode: tournament.CountryCode, Postcode: pgtype.Text{String: tournament.PostalCode, Valid: true}, Slug: tournament.Slug, EndAt: pgtype.Date{Time: time.Unix(int64(tournament.EndAt), 0), Valid: true}})
+
+		if tournamenterr != nil {
+			println(tournamenterr.Error())
 			continue
 		}
-		for _, match := range matches {
-			// Process match
-			err := processMatch(match, event)
-			if err != nil {
-				// Handle error
-				continue
+
+		for _, event := range tournament.Events {
+			if event.Videogame.Id == 1 && (slices.Contains([]string{"MELEE", "SINGLES", "SUPER SMASH BROS. MELEE", "SUPER SMASH BROS. MELEE - SINGLES"}, strings.ToUpper(event.Name)) || strings.Contains(strings.ToUpper(event.Name), "MELEE SINGLES")) {
+				// Process event
+				// create event in db
+				eventDB, err := qurries.CreateEvent(ctx, postgres.CreateEventParams{Name: event.Name, StartGgID: int64(event.Id), TournamentID: tournamentDB.TournamentID})
+				if err != nil {
+					println(err.Error())
+					continue
+				}
+
+				matches, err := startgg.GetMatches(event.Id)
+				if err != nil {
+					// Handle error
+					continue
+				}
+				for _, match := range matches {
+					// Process match
+					matchErr := processMatch(match, eventDB.EventID, tournament.EndAt, qurries, ctx)
+					if matchErr != nil {
+						if strings.Contains(matchErr.Error(), "match conditions not met") {
+							continue
+						} else {
+							panic(matchErr)
+						}
+
+						// Handle error
+					}
+				}
 			}
 		}
 	}
-
 }

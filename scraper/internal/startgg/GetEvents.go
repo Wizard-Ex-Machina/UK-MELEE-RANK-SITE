@@ -21,20 +21,22 @@ type eventRes struct {
 }
 
 type Tournament struct {
-	Slug        string `json:"slug"`
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	CountryCode string `json:"countryCode"`
-	Events      []struct {
-		Name      string `json:"name"`
-		Id        int    `json:"id"`
-		Videogame struct {
-			Id int `json:"id"`
-		} `json:"videogame"`
-	} `json:"events"`
-	NumAttendees int    `json:"numAttendees"`
-	EndAt        int    `json:"endAt"`
-	PostalCode   string `json:"postalCode"`
+	Slug         string  `json:"slug"`
+	Id           int     `json:"id"`
+	Name         string  `json:"name"`
+	CountryCode  string  `json:"countryCode"`
+	Events       []Event `json:"events"`
+	NumAttendees int     `json:"numAttendees"`
+	EndAt        int     `json:"endAt"`
+	PostalCode   string  `json:"postalCode"`
+}
+
+type Event struct {
+	Name      string `json:"name"`
+	Id        int    `json:"id"`
+	Videogame struct {
+		Id int `json:"id"`
+	} `json:"videogame"`
 }
 
 func GetEvents() ([]Tournament, error) {
@@ -43,7 +45,7 @@ func GetEvents() ([]Tournament, error) {
 	page := 1
 	retries := 0
 	tournaments := []Tournament{}
-	for pageLength > 0 {
+	for pageLength > 0 && page < 10 {
 
 		temp, err := getEventsPage(page, token)
 		if err != nil {
