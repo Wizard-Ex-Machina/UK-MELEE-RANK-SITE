@@ -39,41 +39,47 @@ type Event struct {
 	} `json:"videogame"`
 }
 
-func GetEvents() ([]Tournament, error) {
-	pageLength := 1
+func GetEvents(before time.Time) ([]Tournament, error) {
+	pageLength := 80
 	token, _ := config.STARTGG_API_TOKEN()
 	page := 1
 	retries := 0
 	tournaments := []Tournament{}
-	for pageLength > 0 && page < 10 {
+	for before.Unix() < time.Now().AddDate(0, 6, 0).Unix() {
+		println(len(tournaments))
+		for pageLength >= 80 {
+			temp, err := getEventsPage(page, token, before)
+			if err != nil {
+				if err.Error() == "429" {
+					time.Sleep(5 * time.Second)
 
-		temp, err := getEventsPage(page, token)
-		if err != nil {
-			if err.Error() == "429" {
-				time.Sleep(5 * time.Second)
-
-			} else {
-				fmt.Println(err.Error())
-				if retries > 10 {
-					page++
-					retries = 0
+				} else {
+					fmt.Println(err.Error())
+					if retries > 10 {
+						page++
+						retries = 0
+					}
+					retries++
 				}
-				retries++
+			} else {
+				tournaments = append(tournaments, temp...)
+				pageLength = len(temp)
+				println(strconv.Itoa(len(tournaments)))
+				page += 1
 			}
-		} else {
-			tournaments = append(tournaments, temp...)
-			pageLength = len(temp)
-			println(strconv.Itoa(len(tournaments)))
-			page += 1
 		}
+		page = 1
+		pageLength = 80
+		before = before.AddDate(0, 6, 0)
+		println(before.GoString())
 	}
 	return tournaments, nil
 }
 
-func getEventsPage(page int, token string) ([]Tournament, error) {
+func getEventsPage(page int, token string, before time.Time) ([]Tournament, error) {
 	url := "https://api.start.gg/gql/alpha"
 
-	payload := strings.NewReader("{\"query\":\"query (, $page: Int!) {\\n  tournaments(\\n    query: {page: $page, perPage:  100, filter: {past: true,  videogameIds: [1]} }\\n  ) {\\n    nodes {\\n\\t\\t\\tslug\\n      id\\n      name\\n      countryCode\\n      events {\\n        name\\n        id\\n\\t\\t\\t\\tvideogame {\\n\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t}\\n      }\\n      numAttendees\\n      endAt\\n      postalCode\\n    }\\n  }\\n}\\n\\n\",\"variables\":{\"page\":" + strconv.Itoa(page) + "}}")
+	payload := strings.NewReader("{\n  \"query\": \"query (, $page: Int!) {\\n  tournaments(\\n    query: {page: $page, perPage:  80, filter: {past: true, videogameIds: [1], beforeDate: " + strconv.FormatInt(before.AddDate(0, 6, 0).Unix(), 10) + ", afterDate: " + strconv.FormatInt(before.Unix(), 10) + "} }\\n  ) {\\n    nodes {\\n\\t\\t\\tslug\\n      id\\n      name\\n      countryCode\\n      events {\\n        name\\n        id\\n\\t\\t\\t\\tvideogame {\\n\\t\\t\\t\\t\\tid\\n\\t\\t\\t\\t}\\n      }\\n      numAttendees\\n      endAt\\n      postalCode\\n    }\\n  }\\n}\\n\\n\",\n  \"variables\": {\n    \"page\": " + strconv.Itoa(page) + "\n  }\n}")
 
 	req, _ := http.NewRequest("POST", url, payload)
 

@@ -24,7 +24,8 @@ func Scraper() {
 	if err != nil {
 		panic(err)
 	}
-	events, err := startgg.GetEvents()
+	startDate := time.Date(2014, 1, 1, 0, 0, 0, 0, time.UTC)
+	events, err := startgg.GetEvents(startDate)
 	qurries := postgres.New(db)
 	if err != nil {
 		// Handle error
