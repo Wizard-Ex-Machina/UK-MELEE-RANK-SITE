@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Cinzel,
+  Texturina,
+  Playfair_Display,
+  Space_Mono,
+} from "next/font/google";
 import "./globals.css";
+import { PostHog } from "posthog-js";
+import { PostHogProvider } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -9,6 +18,29 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
+
+  subsets: ["latin"],
+});
+
+const texturina = Texturina({
+  variable: "--font-texturina",
+  subsets: ["latin"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
+  weight: "700",
+  subsets: ["latin"],
+});
+
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -25,9 +57,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${texturina.variable} ${cinzel.variable} ${playfairDisplay.variable} ${spaceMono.variable} antialiased bg-surface-300`}
       >
-        {children}
+        <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>
   );

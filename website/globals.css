@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-old: font-[family-name: var(--font-texturina)];
+}
