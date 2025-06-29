@@ -3,3 +3,9 @@
 @theme inline {
   --font-old: font-[family-name: var(--font-texturina)];
 }
+
+@layer components {
+  .tab {
+    @apply rounded-md aria-selected:bg-darkwave-400 bg-darkwave-200 px-2;
+  }
+}

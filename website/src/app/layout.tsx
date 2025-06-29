@@ -57,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${texturina.variable} ${cinzel.variable} ${playfairDisplay.variable} ${spaceMono.variable} antialiased bg-surface-300`}
+        className={`${geistSans.variable} ${geistMono.variable} ${texturina.variable} ${cinzel.variable} ${playfairDisplay.variable} ${spaceMono.variable} antialiased bg-surface-300 dark:bg-darkwave-100`}
       >
         <PostHogProvider>{children}</PostHogProvider>
       </body>

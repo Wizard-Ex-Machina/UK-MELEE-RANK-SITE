@@ -9,8 +9,21 @@
   --color-surface-300: #cbd0cd;
   --color-surface-400: #bec2c0;
   --color-surface-500: #b1b5b3;
+  /** Theme tonal surface colors */
+  --color-darkwave-50: #16161f;
+  --color-darkwave-100: #2b2b34;
+  --color-darkwave-200: #42424a;
+  --color-darkwave-300: #5a5a61;
+  --color-darkwave-400: #737379;
+  --color-darkwave-500: #8e8d93;
+  --breakpoint-3xl: 107.5rem;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
+@layer components {
+  .tab {
+    @apply rounded-md aria-selected:bg-darkwave-200/90 bg-darkwave-200/40 w-full px-2 py-1;
+  }
 }
