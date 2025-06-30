@@ -20,7 +20,7 @@ export default function HistoryTabs({ id }: { id: string }) {
   return (
     <div className="w-full h-96 flex p-2 flex-col rounded-md bg-darkwave-100/60 text-white">
       <TabProvider>
-        <TabList className="min-h-11 w-full gap-1 rounded-md p-1 bg-darkwave-100/80 flex justify-between">
+        <TabList className="min-h-11 w-full gap-1 rounded-md p-2 bg-darkwave-100/80 flex justify-between">
           <Tab className="tab">Matches</Tab>
           <Tab className="tab">Placements</Tab>
           <Tab className="tab">Opponents</Tab>

@@ -5,6 +5,7 @@ import { useDisclosureStore } from "@ariakit/react";
 import RatingHistoryChart from "./Leaderboarditem/RatingHistoryChart";
 import HistoryTabs from "./Leaderboarditem/HistoryTabs";
 import { useState } from "react";
+import RatingCalendar from "./Leaderboarditem/RatingCalendar";
 
 function colorFromPercentile(percentile: number) {
   if (percentile > 82.5)
@@ -89,6 +90,7 @@ export default function LeaderboardItem({
                 <RatingHistoryChart id={id} percentile={percentile} />
               </div>
               <HistoryTabs id={id} />
+              <RatingCalendar id={id} />
             </div>
           )}
         </AriaKit.DisclosureContent>

@@ -7,7 +7,7 @@ export default function Titlebar({ pageTitle }: { pageTitle: string }) {
         <div className="w-full lg:w-3/5 text-wrap">
           <div className="tracking-widest font-[family-name:var(--font-cinzel)] font-black text-5xl lg:text-8xl xl:text-9xl">
             <span className="bg-gradient-to-br from-green-400 to-teal-600 bg-clip-text text-transparent">
-              Witch{" "}
+              Wizard{" "}
             </span>
             <span className="bg-gradient-to-br from-red-500 to-rose-700 bg-clip-text text-transparent">
               Ex{" "}

@@ -14,7 +14,7 @@ export default async function Home() {
     <>
       <Titlebar pageTitle="Glicko 2 leaderboard of melee players" />
       <div className="justify-center flex w-full overflow-clip max-w-screen p-4">
-        <div className="xl:w-3/5 grid grid-cols-1 gap-y-4">
+        <div className="md:w-full 3xl:w-6/9 grid grid-cols-1 gap-y-4">
           {leaderboard.map(
             (
               player: { id: string; name: string; r: number; rd: number },
