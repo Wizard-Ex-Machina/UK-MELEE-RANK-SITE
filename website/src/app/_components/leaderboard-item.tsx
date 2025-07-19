@@ -2,10 +2,10 @@
 
 import * as AriaKit from "@ariakit/react";
 import { useDisclosureStore } from "@ariakit/react";
-import RatingHistoryChart from "./Leaderboarditem/RatingHistoryChart";
-import HistoryTabs from "./Leaderboarditem/HistoryTabs";
+import RatingHistoryChart from "./leaderboard-item/rating-history-chart";
+import HistoryTabs from "./leaderboard-item/history-tabs";
 import { useState } from "react";
-import RatingCalendar from "./Leaderboarditem/RatingCalendar";
+import RatingCalendar from "./leaderboard-item/rating-calendar";
 
 function colorFromPercentile(percentile: number) {
   if (percentile > 82.5)
@@ -44,6 +44,8 @@ export default function LeaderboardItem({
   name,
   r,
   rd,
+  rankDelta,
+  rDelta,
 }: {
   percentile: number;
   id: string;
@@ -51,22 +53,24 @@ export default function LeaderboardItem({
   name: string;
   r: number;
   rd: number;
+  rankDelta: number;
+  rDelta: number;
 }) {
   const [open, setOpen] = useState(false);
   const disclosureStore = useDisclosureStore({ open, setOpen });
   return (
     <div
-      className={`min-w-full w-max-full font-[family-name:var(--font-space-mono)] grid grid-cols-1 bg-darkwave-200"} rounded-md ${colorFromPercentileFade(percentile)}`}
+      className={`min-w-full w-max-full transition-all duration-300 font-[family-name:var(--font-space-mono)] grid grid-cols-1 bg-darkwave-200"} rounded-md ${colorFromPercentileFade(percentile)} ${open && "3xl:-mx-32"} ${!open && "hover:3xl:-mx-8"}`}
     >
       <AriaKit.DisclosureProvider store={disclosureStore}>
         <AriaKit.Disclosure
-          className={`w-full max-w-full min-h-12 h-12 max-h-24 flex col-span-3 items-center px-4 rounded-md font-bold hover:cursor-pointer ${colorFromPercentile(percentile)}  text-white`}
+          className={`w-full max-w-full min-h-12 h-12 max-h-24 flex col-span-3 items-center px-4 rounded-md font-bold hover:cursor-pointer ${colorFromPercentile(percentile)} text-white`}
         >
           <div className="w-16 items-center">
             <p className="text-center">#{rank}</p>
           </div>
           <div className={`w-16 items-center`}>
-            <p className="text-center">{"~"}</p>
+            <p className="text-center">{`${rankDelta == 0 ? "~" : `${rankDelta < 0 ? "↑" : "↓"}${Math.abs(rankDelta)}`}`}</p>
           </div>
           <div className="w-full px-1 items-center">
             <p className="text-left text-ellipsis">{name}</p>
@@ -75,24 +79,28 @@ export default function LeaderboardItem({
             <p className="text-center">{Math.round(rd)}</p>
           </div>
           <div className="w-16 items-center">
-            <p className={`text-center`}>{"~"}</p>
+            <p
+              className={`text-center`}
+            >{`${rDelta == 0 ? "~" : `${rDelta > 0 ? "↑" : "↓"}${Math.abs(Math.floor(rDelta))}`}`}</p>
           </div>
           <div className="w-24 items-center">
             <p className="text-center">{Math.round(r)}</p>
           </div>
         </AriaKit.Disclosure>
         <AriaKit.DisclosureContent>
-          {open && (
-            <div
-              className={`grid grid-cols-1 p-2 gap-2 w-full 3xl:grid-cols-3`}
-            >
-              <div className="3xl:col-span-2 min-w-full h-96 p-2 bg-darkwave-100/60 rounded-md text-white font-[family-name:var(--font-texturina)]">
-                <RatingHistoryChart id={id} percentile={percentile} />
-              </div>
-              <HistoryTabs id={id} />
-              <RatingCalendar id={id} />
-            </div>
-          )}
+          <div
+            className={`grid grid-cols-1 p-2 gap-2 w-full 3xl:grid-cols-3 transition-all duration-1000 delay-300 ${!open && "h-0"}`}
+          >
+            {open && (
+              <>
+                <div className="3xl:col-span-2 min-w-full h-96 p-2 bg-darkwave-100/60 rounded-md text-white font-[family-name:var(--font-texturina)]">
+                  <RatingHistoryChart id={id} percentile={percentile} />
+                </div>
+                <HistoryTabs id={id} />
+                <RatingCalendar id={id} />
+              </>
+            )}
+          </div>
         </AriaKit.DisclosureContent>
       </AriaKit.DisclosureProvider>
     </div>

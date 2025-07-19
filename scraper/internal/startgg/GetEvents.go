@@ -45,7 +45,7 @@ func GetEvents(before time.Time) ([]Tournament, error) {
 	page := 1
 	retries := 0
 	tournaments := []Tournament{}
-	for before.Unix() < time.Now().AddDate(0, 6, 0).Unix() {
+	for before.Unix() < time.Now().AddDate(-6, 6, 0).Unix() {
 		println(len(tournaments))
 		for pageLength >= 80 {
 			temp, err := getEventsPage(page, token, before)

@@ -1,4 +1,5 @@
-import db from "@/app/_util/db";
+// @ts-nocheck
+import { db } from "@util";
 import { NextRequest } from "next/server";
 import {
   events,

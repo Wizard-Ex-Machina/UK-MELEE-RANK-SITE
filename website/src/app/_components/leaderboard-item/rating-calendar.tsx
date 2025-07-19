@@ -1,3 +1,4 @@
+"use client";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { useEffect, useState } from "react";
 
@@ -58,7 +59,8 @@ export default function RatingCalendar({ id }: { id: string }) {
         margin={{ top: 20, right: 8, bottom: 8, left: 40 }}
         tooltip={(point) => {
           return (
-            <div className="bg-darkwave-50/80 w-48 p-2 text-center rounded-md">{`${point.value > 0 ? "↑" : "↓"} ${Math.abs(Math.floor(+point.value))}`}</div>
+            // @ts-ignore
+            <div className="bg-darkwave-50/80 w-48 float p-2 text-center rounded-md">{`${point.data.name} – ${+point.value > 0 ? "↑" : "↓"} ${Math.abs(Math.floor(+point.value))}`}</div>
           );
         }}
       />

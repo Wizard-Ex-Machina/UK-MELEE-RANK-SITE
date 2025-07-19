@@ -24,6 +24,6 @@ body {
 }
 @layer components {
   .tab {
-    @apply rounded-md aria-selected:bg-darkwave-200/90 bg-darkwave-200/40 w-full px-2 py-1;
+    @apply rounded-md aria-selected:bg-darkwave-200/90 bg-darkwave-200/40 w-full px-2 py-1 hover:cursor-pointer;
   }
 }

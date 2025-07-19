@@ -1,18 +1,18 @@
-import { desc, eq, inArray, sql } from "drizzle-orm";
-import db from "../../_util/db";
-import { NextRequest, NextResponse } from "next/server";
+// @ts-nocheck
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { db } from "@util";
 import {
   events,
   matches,
   matchSlot,
   players,
   tournaments,
-} from "../../../../drizzle/schema";
+} from "../../../drizzle/schema";
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const date = new Date(searchParams.get("date") || Date.now());
-  console.log(req.url.toString());
+export async function getLeaderboard(endDate = new Date()) {
+  let startDate = new Date(endDate);
+  startDate.setFullYear(startDate.getFullYear() - 1);
+
   const activePlayers = await db
     .select({
       playerId: matchSlot.playerId,
@@ -22,7 +22,12 @@ export async function GET(req: NextRequest) {
     .innerJoin(matches, eq(matchSlot.matchId, matches.matchId))
     .innerJoin(events, eq(matches.eventId, events.eventId))
     .innerJoin(tournaments, eq(events.tournamentId, tournaments.tournamentId))
-    .where(sql`${tournaments.endAt} >= ${date}`)
+    .where(
+      and(
+        sql`${tournaments.endAt} <= ${endDate}`,
+        sql`${tournaments.endAt} >= ${startDate}`,
+      ),
+    )
     .groupBy(matchSlot.playerId)
     .having(sql`COUNT(*) > 30`) // Ensure only players with more than 30 matches
     .execute();
@@ -38,15 +43,27 @@ export async function GET(req: NextRequest) {
     .from(matchSlot)
     .innerJoin(matches, eq(matchSlot.matchId, matches.matchId))
     .innerJoin(players, eq(matchSlot.playerId, players.playerId))
-    .where(inArray(matchSlot.playerId, playerIds))
+    .innerJoin(events, eq(matches.eventId, events.eventId))
+    .innerJoin(tournaments, eq(events.tournamentId, tournaments.tournamentId))
+    .where(
+      and(
+        inArray(matchSlot.playerId, playerIds),
+        sql`${tournaments.endAt} <= ${endDate}`,
+      ),
+    )
     .orderBy(matchSlot.playerId, desc(matches.createdAt)) // Ensure this matches the DISTINCT ON column
     .execute();
 
-  return Response.json(
-    latestMatches.sort((a: any, b: any) => {
+  return latestMatches
+    .sort((a: any, b: any) => {
       if (a.r === b.r) return 0;
       if (a.r < b.r) return 1;
       return -1;
-    }),
-  );
+    })
+    .map((player) => ({
+      id: player.id,
+      name: player.name,
+      r: +player.r,
+      rd: +player.rd,
+    }));
 }

@@ -1,3 +1,4 @@
+"use client";
 import { ResponsiveLine, Line } from "@nivo/line";
 import { useState, useMemo, useEffect } from "react";
 
@@ -59,8 +60,8 @@ export default function RatingHistoryChart({
       colors={[color(percentile)]}
       yScale={{
         type: "linear",
-        min: "0",
-        max: "3500",
+        min: 0,
+        max: 3500,
       }}
       theme={{
         text: {
@@ -68,6 +69,7 @@ export default function RatingHistoryChart({
           fontFamily: "var(--font-texturia)",
         },
       }}
+      // @ts-ignore
       gridYValues={[0, 500, 1000, 1500, 2000, 2500, 3000, 3500]}
       xScale={{
         type: "time",

@@ -24,12 +24,19 @@ func Scraper() {
 	if err != nil {
 		panic(err)
 	}
+
 	startDate := time.Date(2014, 1, 1, 0, 0, 0, 0, time.UTC)
-	events, err := startgg.GetEvents(startDate)
+
 	qurries := postgres.New(db)
+
+	lastTournament, err := qurries.GetLastTournament(ctx)
+	if err == nil {
+		startDate = lastTournament.EndAt.Time.AddDate(0, -1, 0)
+	}
+
+	events, err := startgg.GetEvents(startDate)
 	if err != nil {
-		// Handle error
-		return
+		panic(err)
 	}
 	slices.SortFunc(events, func(a, b startgg.Tournament) int {
 		return cmp.Compare(a.EndAt, b.EndAt)
@@ -67,6 +74,25 @@ func Scraper() {
 							continue
 						} else {
 							panic(matchErr)
+						}
+
+						// Handle error
+					}
+				}
+
+				placements, err := startgg.GetPlacements(event.Id)
+				if err != nil {
+					// Handle error
+					continue
+				}
+				for _, placement := range placements {
+					// Process placement
+					placementErr := processPlacement(placement, eventDB.EventID, qurries, ctx)
+					if placementErr != nil {
+						if strings.Contains(placementErr.Error(), "placement conditions not met") {
+							continue
+						} else {
+							panic(placementErr)
 						}
 
 						// Handle error

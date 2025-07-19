@@ -54,3 +54,11 @@ RETURNING *;
 INSERT INTO match_characters (match_id, player_id, game_number, win, pre_rating, character_id)
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
+
+-- name: CreatePlacement :one
+INSERT INTO placements (event_id, player_id, placement)
+VALUES ($1, $2, $3)
+RETURNING *;
+
+-- name: GetLastTournament :one
+SELECT * FROM tournaments ORDER BY end_at DESC LIMIT 1;
