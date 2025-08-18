@@ -1,11 +1,18 @@
 "use-client";
 
 import { TabProvider, Tab, TabList, TabPanel } from "@ariakit/react";
-import { Span } from "next/dist/trace";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Spinner from "../spinner";
-export default function HistoryTabs({ id }: { id: string }) {
+
+export default function HistoryTabs({
+  id,
+  bgColor,
+}: {
+  id: string;
+  bgColor: string;
+}) {
   const [matches, setMatches] = useState([]);
+  const [placements, setPlacements] = useState([]);
 
   useEffect(() => {
     fetch(
@@ -13,6 +20,13 @@ export default function HistoryTabs({ id }: { id: string }) {
     ).then((data) => {
       data.json().then((json) => {
         setMatches(json);
+      });
+    });
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/player/placements?player=${id}`,
+    ).then((data) => {
+      data.json().then((json) => {
+        setPlacements(json);
       });
     });
   }, [id]);
@@ -29,11 +43,12 @@ export default function HistoryTabs({ id }: { id: string }) {
         <TabPanel className="h-full p-1 pb-2 rounded-md overflow-y-scroll">
           <MatchesTab matches={matches} />
         </TabPanel>
-        <TabPanel className="text-center flex justify-center h-full items-center">
-          <p>placements not implemented</p>
+
+        <TabPanel className="h-full p-1 pb-2 rounded-md overflow-y-scroll">
+          <PlacementsTab placements={placements} bgColor={bgColor} />
         </TabPanel>
 
-        <TabPanel className="text-center flex justify-center h-full items-center">
+        <TabPanel className="h-full p-1 pb-2 rounded-md overflow-y-scroll">
           opponents not implemented
         </TabPanel>
       </TabProvider>
@@ -73,7 +88,13 @@ function MatchesTab({ matches }: { matches: any[] }) {
   );
 }
 
-function PlacementsTab({ placements }: { placements: any[] }) {
+function PlacementsTab({
+  placements,
+  bgColor,
+}: {
+  placements: any[];
+  bgColor: string;
+}) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,19 +104,21 @@ function PlacementsTab({ placements }: { placements: any[] }) {
   return loading == true ? (
     <Spinner />
   ) : (
-    <div className="grid grid-cols-1 gap-1">
+    <div className="grid grid-cols-1 gap-1 w-full">
       {placements.map((placement, index) => {
         if (index == 0) console.log(placement);
         return (
           <div
             key={placement.placementId}
-            className={`p-1 grid grid-cols-7 items-center rounded-md ${placement.rank > 0 ? "bg-green-500/25" : "bg-red-500/25"} w-full`}
+            className={`p-1 grid grid-cols-4 rounded-md ${bgColor} w-full items-center`}
           >
-            <div className="col-span-3 w-full">{placement.opponentName}</div>
+            <div className="col-span-3 w-full text-ellipsis text-left">
+              {placement.tournament}
+            </div>
 
-            <div className="col-span-3 text-center">{`${placement.rank}`}</div>
-
-            <div className="col-span-1 text-right">{`${placement.rank}`}</div>
+            <div className="col-span-1 text-right">
+              {ordinal(placement.placement)}
+            </div>
           </div>
         );
       })}
@@ -133,4 +156,26 @@ function OpponentsTab({ opponents }: { opponents: any[] }) {
       })}
     </div>
   );
+}
+
+function ordinal(n: number) {
+  switch (n % 100) {
+    case 11:
+      return "11th";
+    case 12:
+      return "12th";
+    case 13:
+      return "13th";
+    default:
+      switch (n % 10) {
+        case 1:
+          return `${n}st`;
+        case 2:
+          return `${n}nd`;
+        case 3:
+          return `${n}rd`;
+        default:
+          return `${n}th`;
+      }
+  }
 }

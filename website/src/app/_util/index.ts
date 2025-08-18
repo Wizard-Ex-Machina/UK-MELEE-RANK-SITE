@@ -1,5 +1,5 @@
-import nth from "./nth";
+import ordinal from "./ordinal";
 import db from "./db";
 import { getLeaderboard } from "./leaderboard";
 
-export { nth, db, getLeaderboard };
+export { ordinal, db, getLeaderboard };

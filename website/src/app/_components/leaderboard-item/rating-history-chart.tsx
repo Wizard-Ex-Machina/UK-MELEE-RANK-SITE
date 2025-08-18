@@ -1,6 +1,6 @@
 "use client";
-import { ResponsiveLine, Line } from "@nivo/line";
-import { useState, useMemo, useEffect } from "react";
+import { ResponsiveLine } from "@nivo/line";
+import { useState, useEffect } from "react";
 
 export default function RatingHistoryChart({
   id,
@@ -13,7 +13,6 @@ export default function RatingHistoryChart({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Fetching rating history data...");
     fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/player/rating-history?player=${id}`,
     ).then((data) => {

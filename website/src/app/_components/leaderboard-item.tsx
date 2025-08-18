@@ -96,7 +96,10 @@ export default function LeaderboardItem({
                 <div className="3xl:col-span-2 min-w-full h-96 p-2 bg-darkwave-100/60 rounded-md text-white font-[family-name:var(--font-texturina)]">
                   <RatingHistoryChart id={id} percentile={percentile} />
                 </div>
-                <HistoryTabs id={id} />
+                <HistoryTabs
+                  id={id}
+                  bgColor={colorFromPercentileFade(percentile)}
+                />
                 <RatingCalendar id={id} />
               </>
             )}

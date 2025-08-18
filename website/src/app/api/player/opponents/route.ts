@@ -55,5 +55,29 @@ export async function GET(req: NextRequest) {
     .orderBy(desc(matchesTable.createdAt))
     .execute();
 
-  return Response.json(playerMatches);
+  try {
+    const opponents = [];
+    playerMatches.forEach(({ opponentId, name }) => {
+      opponents.push({ id: opponentId, name: name });
+    });
+
+    const finalData = opponents.map((opponent) => {
+      const matches = playerMatches.filter(
+        ({ opponentId }) => opponent.id == opponentId,
+      );
+      matches.reduce((acc, curr) => {
+        acc = {
+          wins: acc.wins + curr.score,
+          loses: acc.loses + curr.opponentScore,
+        };
+      });
+      console.log(acc);
+      return { ...opponent, ...acc };
+    });
+
+    return Response.json(finalData);
+  } catch (err) {
+    console.log("testerr");
+    return Response.json(err);
+  }
 }
