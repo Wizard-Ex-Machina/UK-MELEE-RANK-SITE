@@ -1,5 +1,8 @@
 {
 	"dependencies": {
 		"posthog-js": "^1.255.1"
+	},
+	"devDependencies": {
+		"@nx/docker": "^22.5.2"
 	}
 }

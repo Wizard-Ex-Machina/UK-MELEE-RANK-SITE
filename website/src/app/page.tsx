@@ -6,7 +6,7 @@ import LeaderboardItem from "./_components/leaderboard-item";
 import { getLeaderboard } from "@util";
 
 export default async function Home() {
-  const date = new Date("2019-04-07");
+  const date = new Date("2020-04-07");
   const oldDate = new Date(date);
   oldDate.setMonth(date.getMonth() - 1);
 
